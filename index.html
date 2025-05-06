@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>33 vikingo'S Tacos</title>
+  <link rel="stylesheet" href="css.css">
+  <script src="js.js" defer></script> 
+</head>
+
+<body>
+
+  <!-- Encabezado con logo -->
+  <header>
+    <div class="header-contenido">
+      <img src="logo.jpg" alt="Logo 33 Vikingos" class="logo">
+      <h1>33 VIKINGO'S TACOS</h1>
+    </div>
+  </header>
+
+  <main class="main-contenedor">
+    <!-- Contenedor para las secciones Piso y Orden -->
+    <div class="grid-piso-orden">
+      <!-- Sección Piso -->
+<section class="piso">
+  <h3>Piso</h3>
+  <div class="botones-clientes">
+    <button id="agregar-cliente-mesa">Agregar cliente a mesa</button>
+    <button id="agregar-cliente-barra">Agregar cliente a barra</button>
+    <button id="eliminar-cliente">Eliminar cliente</button>
+  </div>
+
+  <!-- Aquí se insertarán las mesas -->
+  <div class="recuadro-mesas"></div>
+</section>
+
+      <!-- Sección Orden -->
+      <section class="orden">
+        <h3>Orden</h3>
+
+        <div class="orden-textarea">
+          <textarea class="orden-nota" placeholder="Orden"></textarea>
+        </div>
+        <div class="checkboxes-opciones"> 
+          <h3>Opciones</h3>
+          <label><input type="checkbox" id="cebolla"> Cebolla</label>
+          <label><input type="checkbox" id="papa"> Papa</label>
+          <label><input type="checkbox" id="queso"> Queso</label> 
+                    <label><input type="checkbox" id="bistec"> Bistec</label>
+                              <label><input type="checkbox" id="suadero"> Suadero</label> 
+ 
+ 
+ 
+ 
+
+        </div>
+
+        <div class="botones-producto">
+        <button data-orden="Bistec" data-precio="30">Bistec - $30</button>
+          <button data-orden="Suadero" data-precio="30">Suadero - $30</button>
+
+          <button data-orden="Huarache" data-precio="40">Huarache - $40</button>
+            <button data-orden="Huarache Especial" data-precio="45">Huarache Especial - 45</button>
+          <button data-orden="Torta" data-precio="50">Torta - $50</button>
+          <button data-orden="Botana" data-precio="20">Botana - $20</button>
+          <button data-orden="Refresco" data-precio="25">Refresco - $25</button>
+          <button data-orden="Sangria" data-precio="35">Sangria - $35</button>
+                  <button data-orden="Papas250" data-precio="60">Papas F. 250g - $60</button>
+               <button data-orden="Papas500" data-precio="100">Papas F. 500g - $100</button>
+               <button data-orden="Agua" data-precio="25">Agua - $25</button>
+        </div>
+
+      </section>
+    </div>
+
+    <!-- Sección Total -->
+    <section class="total">
+      <div class="total-vendido">
+        <h3>Total Vendido</h3>
+        <a href="menu.html">Menu</a>
+      </div>
+      </div>
+    </section>
+
+  </main>
+
+</body>
+</html>

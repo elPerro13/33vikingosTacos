@@ -1,0 +1,270 @@
+/* Estilo general del cuerpo del documento */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #000;
+  margin: 0;
+  padding: 0;
+  color: #333;
+}
+
+/* Estilo del encabezado principal */
+header {
+  background-color: #000;
+  color: #eeeb17;
+  padding: 1rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  position: relative; /* Necesario para posicionar el icono dentro de este contenedor */
+}
+
+/* Contenedor del contenido del header */
+.header-contenido {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 1rem;
+  padding: 0 1rem;
+}
+
+/* Ajustes del logo */
+.logo {
+  height: 100px;
+  width: auto;
+  border-radius: 50%;
+  margin-right: auto;
+}
+
+/* Ajustes del h1 a la derecha */
+.titulo-derecha {
+  margin-left: auto;
+  color: #eeeb17;
+}
+
+/* Estilo para el icono de Facebook */
+.facebook-link {
+  position: absolute; /* Posiciona el icono de manera absoluta */
+  top: 10px; /* Distancia desde el borde superior */
+  right: 10px; /* Distancia desde el borde derecho */
+}
+
+.facebook-icon {
+  width: 30px;
+  height: auto;
+}
+
+/* Estilo general del contenedor principal */
+.main-contenedor {
+  padding: 2rem;
+}
+
+.grid-piso-orden {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.piso, .orden, .total {
+  background-color: #333;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  color: white;
+}
+
+.botones-clientes button {
+  padding: 0.5rem 1rem;
+  background-color: #333;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.botones-clientes button:hover {
+  background-color: #eeeb17;
+}
+
+.orden-textarea {
+  margin-bottom: 1rem;
+}
+
+.orden-nota {
+  width: 100%;
+  height: 80px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  padding: 0.5rem;
+  resize: none;
+  font-size: 1rem;
+}
+
+.checkboxes-opciones {
+  margin-top: 1rem;
+  background-color: #222;
+  padding: 0.5rem;
+  border-radius: 8px;
+  border: 1px solid #444;
+  display: inline-flex;
+  gap: 1rem;
+}
+
+.checkboxes-opciones label {
+  font-size: 1rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+  display: flex;
+  align-items: center;
+  color: white;
+}
+
+.checkboxes-opciones label:hover {
+  background-color: #eeeb17;
+  color: #000;
+  cursor: pointer;
+}
+
+.checkboxes-opciones input[type="checkbox"] {
+  margin-right: 0.4rem;
+}
+
+.botones-producto button {
+  padding: 0.5rem 1rem;
+  background-color: #333;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.botones-producto button:hover {
+  background-color: #eeeb17;
+}
+
+h3 {
+  color: #eeeb17;
+}
+
+/* 🆕 NUEVO: Reemplazo visual del recuadro con borde 3D */
+.recuadro-mesas {
+  width: 500px;
+  height: 300px;
+  background-color: #fff;
+  margin-top: 1rem;
+  box-sizing: border-box;
+  border-radius: 10px;
+
+  /* Borde 3D */
+  border: 10px ridge #555;
+
+  /* Barra plateada */
+  position: relative;
+  box-shadow:
+    inset 0 -40px 0 0 #333, /* sombra interna para la barra plateada */
+    inset 0 -45px 0 3px #000; /* sombra extra para más profundidad */
+
+  padding: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* Barra plateada en la parte inferior de recuadro-mesas */
+.recuadro-mesas::after {
+  content: "";
+  display: block;
+  width: 100%;
+  height: 5px;
+  background: linear-gradient(to right, #cccccc, #ffffff, #cccccc); /* Gradiente plateado */
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+
+/* 🆕 NUEVO: Estilo individual para cada mesa */
+.mesa {
+  background-color: #aaa;
+  width: 100px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  font-weight: bold;
+  color: #000;
+  font-size: 1rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.mesa:hover {
+  background-color: #eeeb17; /* Color amarillo al pasar el ratón */
+  transform: scale(1.05); /* Efecto de ampliación suave */
+}
+
+/* Recuadro de clientes debajo de la barra plateada */
+.recuadro-clientes {
+  position: absolute;
+  bottom: 10px;
+  left: 0;
+  right: 0;
+  display: flex;
+  gap: 10px;
+  padding: 10px;
+  justify-content: center;
+}
+
+.recuadro-clientes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  right: 10px;
+  gap: 10px;
+  z-index: 1;
+}
+
+/* Círculo cliente */
+.cc {
+  width: 40px;
+  height: 40px;
+  background-color: #888;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #000;
+  font-size: 0.8rem;
+  text-align: center;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.cc:hover {
+  background-color: #eeeb17; /* Color amarillo al pasar el ratón */
+  transform: scale(1.05);
+}
+
+.mesa,
+.cc {
+  position: relative;
+}
+
+.mesa input[type="checkbox"],
+.cc input[type="checkbox"] {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  transform: scale(0.8);
+}
+
+.orden-nota {
+  width: 100%;
+  height: 300px; /* Aumenta la altura a 150px o el valor que necesites */
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  padding: 0.5rem;
+  resize: none;
+  font-size: 1rem;
+  margin-left: -10px; /* mueve a la izquierda */
+}

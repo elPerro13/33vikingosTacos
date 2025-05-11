@@ -4,10 +4,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnEliminarCliente = document.getElementById("eliminar-cliente");
   const ordenTextarea = document.querySelector(".orden-nota");
   const botonesProducto = document.querySelectorAll(".botones-producto button");
-  const totalVendido = document.querySelector(".total-vendido");
+  const totalSpan = document.getElementById("total-acumulado");
 
   const ordenesPorElemento = new Map();
   let totalPrecio = 0;
+  let totalAcumulado = 0;
   let idSeleccionadoGlobal = null;
 
   const piso = document.querySelector(".piso");
@@ -22,7 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!recuadroClientes) {
     recuadroClientes = document.createElement("div");
     recuadroClientes.classList.add("recuadro-clientes");
-    recuadroMesas.appendChild(recuadroClientes);
+    piso.appendChild(recuadroClientes);
   }
 
   const generarID = (() => {
@@ -64,6 +65,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     div.addEventListener("click", (e) => {
       if (e.target !== checkbox) {
+        document.querySelectorAll(".mesa, .cc").forEach(el => el.classList.remove("seleccionado"));
+        div.classList.add("seleccionado");
         idSeleccionadoGlobal = id;
         mostrarOrden(id);
       }
@@ -74,46 +77,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
   btnAgregarMesa.addEventListener("click", () => {
     const nombre = prompt("¿Cómo se llamará la mesa?");
-    if (!nombre) return;
+    if (!nombre || !nombre.trim()) return;
     const mesa = crearElemento(nombre, "mesa");
     recuadroMesas.appendChild(mesa);
   });
 
   btnAgregarBarra.addEventListener("click", () => {
     const nombre = prompt("¿Cómo se llama el cliente?");
-    if (!nombre) return;
+    if (!nombre || !nombre.trim()) return;
     const cliente = crearElemento(nombre, "cc");
     recuadroClientes.appendChild(cliente);
   });
 
   botonesProducto.forEach((button) => {
     button.addEventListener("click", () => {
+      const nombreProducto = button.getAttribute("data-orden");
+
       if (!idSeleccionadoGlobal) return;
 
-      const nombreProducto = button.getAttribute("data-orden");
-      let precio = parseFloat(button.getAttribute("data-precio"));
+      let precio = parseFloat(button.getAttribute("data-precio")) || 0;
       let descripcion = `${nombreProducto} - $${precio}`;
-
-      const cebolla = document.getElementById("cebolla").checked;
-      const papa = document.getElementById("papa").checked;
-      const queso = document.getElementById("queso").checked;
-      const bistec = document.getElementById("bistec").checked;
-      const suadero = document.getElementById("suadero").checked;
-
-      const extras = [];
-
-      if (cebolla) extras.push("con cebolla");
-      if (papa) extras.push("con papa");
-      if (queso) {
-        extras.push("con queso");
-        precio += 7;
-      }
-      if (bistec) extras.push("con bistec");
-      if (suadero) extras.push("con suadero");
-
-      if (extras.length > 0) {
-        descripcion += ` (${extras.join(", ")})`;
-      }
 
       const orden = ordenesPorElemento.get(idSeleccionadoGlobal);
       if (!orden) return;
@@ -121,11 +104,59 @@ document.addEventListener("DOMContentLoaded", () => {
       orden.productos.push(descripcion);
       orden.total += precio;
 
-      mostrarOrden(idSeleccionadoGlobal);
-
       totalPrecio += precio;
-      totalVendido.innerHTML = `<h3>Total Vendido: $${totalPrecio.toFixed(2)}</h3>`;
+
+      mostrarOrden(idSeleccionadoGlobal);
     });
+  });
+
+  // Botón "sumar" ahora actualiza el total
+  const btnSumar = document.querySelector('[data-orden="sumar"]');
+  if (btnSumar) {
+    btnSumar.addEventListener("click", () => {
+      if (!idSeleccionadoGlobal) return;  // No hacer nada si no hay cliente/mesa seleccionado
+
+      const orden = ordenesPorElemento.get(idSeleccionadoGlobal);
+      if (!orden) return;
+
+      // Sumar el total de la mesa/cliente seleccionado al total acumulado
+      totalAcumulado += orden.total;
+
+      // Actualizar el total vendido en la interfaz
+      if (totalSpan) {
+        totalSpan.textContent = `$${totalAcumulado.toFixed(2)}`;
+      }
+
+      // Resetear el total de la mesa/cliente después de sumar
+      orden.total = 0;
+      orden.productos = [];
+      mostrarOrden(idSeleccionadoGlobal); // Limpiar el área de la orden
+    });
+  }
+
+  // Permitir que el usuario edite el contenido de la nota y se mantenga
+  ordenTextarea.addEventListener("input", () => {
+    if (!idSeleccionadoGlobal) return; // No hacer nada si no hay cliente/mesa seleccionado
+
+    const orden = ordenesPorElemento.get(idSeleccionadoGlobal);
+    if (!orden) return;
+
+    // Extraer el contenido del textarea
+    const texto = ordenTextarea.value.trim();
+    
+    // Separar por saltos de línea
+    const productos = texto.split("\n").slice(1, -1); // Ignorar la línea con "Cliente/Mesa" y la línea de total
+    
+    // Actualizar los productos y el total
+    orden.productos = productos;
+    orden.total = productos.reduce((total, producto) => {
+      const precio = parseFloat(producto.split('- $')[1]) || 0;
+      return total + precio;
+    }, 0);
+
+    // Actualizar el total mostrado en el textarea
+    const totalNota = `Total: $${orden.total.toFixed(2)}`;
+    ordenTextarea.value = `Cliente/Mesa: ${orden.nombre}\n` + productos.join("\n") + `\n${totalNota}`;
   });
 
   btnEliminarCliente.addEventListener("click", () => {
@@ -134,18 +165,12 @@ document.addEventListener("DOMContentLoaded", () => {
       const checkbox = el.querySelector("input[type='checkbox']");
       if (checkbox && checkbox.checked) {
         const id = el.dataset.id;
-        // ❌ Ya NO se resta el total
-        // const orden = ordenesPorElemento.get(id);
-        // if (orden) {
-        //   totalPrecio -= orden.total;
-        // }
         ordenesPorElemento.delete(id);
         el.remove();
       }
     });
 
     ordenTextarea.value = "";
-    totalVendido.innerHTML = `<h3>Total Vendido: $${totalPrecio.toFixed(2)}</h3>`;
     idSeleccionadoGlobal = null;
   });
 });

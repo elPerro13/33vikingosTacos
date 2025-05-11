@@ -89,13 +89,22 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!nombre || !nombre.trim()) return;
     const cliente = crearElemento(nombre, "cc");
 
-    // Posicionarlo sobre la "barra plateada"
-    cliente.style.position = "absolute";
-    cliente.style.bottom = "5px";
-    cliente.style.left = `${10 + clientesEnBarra * 60}px`;
-    clientesEnBarra++;
+    // Obtener la barra plateada
+    const barraPlateada = document.querySelector(".barra");
 
-    recuadroMesas.appendChild(cliente);
+    if (barraPlateada) {
+      // Asegurarnos de que la barra esté posicionada correctamente
+      const barraRect = barraPlateada.getBoundingClientRect(); // Obtener el área de la barra plateada
+
+      // Colocar el cliente sobre la barra plateada ajustando la posición
+      cliente.style.position = "absolute";
+      cliente.style.bottom = `${barraRect.height + 5}px`; // Coloca el cliente justo encima de la barra
+      cliente.style.left = `${barraRect.left + 10 + clientesEnBarra * 60}px`; // Ajustar el desplazamiento horizontal de los clientes
+
+      clientesEnBarra++; // Incrementar el número de clientes en la barra
+    }
+
+    recuadroMesas.appendChild(cliente); // Agregar el cliente al contenedor
   });
 
   botonesProducto.forEach((button) => {

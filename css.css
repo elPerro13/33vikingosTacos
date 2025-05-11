@@ -10,17 +10,20 @@ body {
 /* Estilo del encabezado principal */
 header {
   background-color: #000;
-  color: #eeeb17;
+  color: #48ea18;
   padding: 1rem;
+  font-family: 'Uncial Antiqua', serif;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
   position: relative; /* Necesario para posicionar el icono dentro de este contenedor */
+  text-align: center; /* Centra el texto dentro del header */
 }
 
 /* Contenedor del contenido del header */
 .header-contenido {
   display: flex;
-  align-items: center;
-  justify-content: flex-start;
+  flex-direction: column; /* Alinea los elementos de arriba hacia abajo */
+  justify-content: center; /* Centra los elementos verticalmente */
+  align-items: center; /* Centra los elementos horizontalmente */
   gap: 1rem;
   padding: 0 1rem;
 }
@@ -36,7 +39,7 @@ header {
 /* Ajustes del h1 a la derecha */
 .titulo-derecha {
   margin-left: auto;
-  color: #eeeb17;
+  color: #48ea18;
 }
 
 /* Estilo para el icono de Facebook */
@@ -80,7 +83,7 @@ header {
 }
 
 .botones-clientes button:hover {
-  background-color: #eeeb17;
+  background-color: #48ea18;
 }
 
 .orden-textarea {
@@ -118,7 +121,7 @@ header {
 }
 
 .checkboxes-opciones label:hover {
-  background-color: #eeeb17;
+  background-color: #48ea18;
   color: #000;
   cursor: pointer;
 }
@@ -137,11 +140,11 @@ header {
 }
 
 .botones-producto button:hover {
-  background-color: #eeeb17;
+  background-color: #48ea18;
 }
 
 h3 {
-  color: #eeeb17;
+  color: #48ea18;
 }
 
 /* 🆕 NUEVO: Reemplazo visual del recuadro con borde 3D */
@@ -196,7 +199,7 @@ h3 {
 }
 
 .mesa:hover {
-  background-color: #eeeb17; /* Color amarillo al pasar el ratón */
+  background-color: #48ea18; /* Color verde al pasar el ratón */
   transform: scale(1.05); /* Efecto de ampliación suave */
 }
 
@@ -226,22 +229,22 @@ h3 {
 
 /* Círculo cliente */
 .cc {
-  width: 40px;
-  height: 40px;
+  width: 80px;          /* Tamaño aumentado */
+  height: 80px;         /* Tamaño aumentado */
+  font-size: 1rem;      /* Tamaño de texto ajustado */
   background-color: #888;
   border-radius: 50%;
   display: flex;
   justify-content: center;
   align-items: center;
   color: #000;
-  font-size: 0.8rem;
   text-align: center;
   cursor: pointer;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
 }
 
 .cc:hover {
-  background-color: #eeeb17; /* Color amarillo al pasar el ratón */
+  background-color: #48ea18; /* Color verde al pasar el ratón */
   transform: scale(1.05);
 }
 

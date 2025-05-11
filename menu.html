@@ -2,107 +2,75 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>33 Vikingos Tacos</title>
-
-  <!-- Fuente Uncial Antiqua -->
-  <link href="https://fonts.googleapis.com/css2?family=Uncial+Antiqua&display=swap" rel="stylesheet">
-
-  <style>
-    body {
-      background-color: #000;
-      font-family: "Uncial Antiqua", system-ui, sans-serif;
-      font-weight: 400;
-      font-style: normal;
-      color: #eeeb17;
-      margin: 0;
-      padding: 0 20px;
-    }
-
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background-color: #000;
-      color: #eeeb17;
-      padding: 10px 20px;
-    }
-
-    .logo {
-      height: 200px;
-    }
-
-    h1 {
-      font-size: 28px;
-      margin: 10px 0;
-    }
-
-    h3 {
-      font-size: 20px;
-      line-height: 1.8;
-      white-space: pre-line;
-    }
-
-    h5 {
-      font-size: 18px;
-      line-height: 1.6;
-      white-space: pre-line;
-    }
-
-    .facebook-link {
-      display: flex;
-      align-items: center;
-      padding: 10px;
-      transform: scale(1.5); /* Aumenta tamaño visualmente */
-      transform-origin: center;
-    }
-
-    .facebook-icon {
-      width: 48px;
-      height: 48px;
-      margin-left: 10px;
-    }
-
-    br {
-      line-height: 1.8;
-    }
-  </style>
+  <title>33 vikingo'S Tacos</title>
+  <link rel="stylesheet" href="css.css">
+  <script src="js.js" defer></script> 
 </head>
 
-<body> 
+<body>
+
+  <!-- Encabezado con logo -->
   <header>
-    <img src="logoMenu.jpeg" alt="Logo 33 Vikingos" class="logo">
-    <h1>33 VIKINGO'S TACOS</h1>
-    <a href="https://www.facebook.com/profile.php?id=61575102311851" target="_blank" class="facebook-link">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" alt="Facebook" class="facebook-icon">
-    </a>
+    <div class="header-contenido">
+      <img src="logo.jpg" alt="Logo 33 Vikingos" class="logo">
+      <h1>33 VIKINGO'S TACOS</h1>
+    </div>
   </header>
 
-  <h1>Tacos</h1>  
-  <h5>
-    Bistec o Suadero con Papa y Cebolla ............. 30<br>
-    Con Queso ....................................... 38<br>
-    Huarache de Suadero Papas y Cebolla ............. 45<br>
-    Con Queso ....................................... 55<br>
-    Torta Bistec Papas y Cebolla .................... 40<br>
-    Con Queso ....................................... 50<br>
-    Papas a la Francesa con Queso ................... 40<br>
-  </h5>
+  <main class="main-contenedor">
+    <!-- Contenedor para las secciones Piso y Orden -->
+    <div class="grid-piso-orden">
+      <!-- Sección Piso -->
+      <section class="piso">
+        <h3>Piso</h3>
+        <div class="botones-clientes">
+          <button id="agregar-cliente-mesa">Agregar cliente a mesa</button>
+          <button id="agregar-cliente-barra">Agregar cliente a barra</button>
+          <button id="eliminar-cliente">Eliminar cliente</button>
+        </div>
 
-  <h1>¡VIKINGO ESPECIAL!</h1>
-  <h5>
-    Bistec o Suadero sobre<br>
-    papas a la Francesa con Queso ................... 70
-  </h5><br>
+        <!-- Aquí se insertarán las mesas -->
+        <div class="recuadro-mesas"></div>
+      </section>
 
-  <h1>De Beber</h1> 
-  <h5>
-    Sangría preparada<br>
-    1lt en vaso escarchado con hielo, sal, tajín y limón ........ 40<br>
-    Refrescos Jarrito o Coca ......................... 30<br>
-    Agua de sabor (horchata, jamaica, tamarindo) ......... 30<br>
-    Agua natural (chica) ........................ 10<br>
-  </h5>
+      <!-- Sección Orden -->
+      <section class="orden">
+        <h3>Orden</h3>
 
-  <h1>SKOL!!!</h1>
+        <div class="orden-textarea">
+          <textarea class="orden-nota" placeholder="Orden"></textarea>
+        </div>
+
+        <div class="botones-producto">
+          <button data-orden="Bistec" data-precio="30">Bistec - $30</button>
+          <button data-orden="Bistec" data-precio="38">Bistec Queso - $38</button>
+          <button data-orden="Suadero" data-precio="30">Suadero - $30</button>
+          <button data-orden="Suadero" data-precio="38">Suadero   Queso- $38</button>
+          <button data-orden="Huarache" data-precio="45">Huarache - $45</button>
+          <button data-orden="Huarache" data-precio="55">Huarache Queso - $55</button>
+          <button data-orden="Torta" data-precio="40">Torta - $40</button>
+          <button data-orden="Torta" data-precio="50">Torta Queso- $50</button>
+          <button data-orden="Papas a la francesa" data-precio="40">Papas a la Francesa- $40</button>
+          <button data-orden="VE" data-precio="70">Vikingo Especial - $70</button>
+          <button data-orden="Refresco" data-precio="30">Refresco - $30</button>
+          <button data-orden="Sangria" data-precio="40">Sangria - $40</button>
+          <button data-orden="Agua" data-precio="25">Agua Sabor - $30</button>
+          <button data-orden="Agua" data-precio="10">Agua Simple- $10</button>
+
+        </div>
+      </section>
+    </div>
+
+    <!-- Sección Total -->
+   <section class="total">
+  <div class="total-vendido">
+    <button data-orden="sumar" data-precio=>sumar</button>
+    <h3>Total Vendido: <span id="total-acumulado">$0.00</span></h3>
+    <a href="menu.html">Menu</a>
+  </div>
+</section>
+
+  </main>
+
 </body>
 </html>

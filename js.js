@@ -12,6 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let idSeleccionadoGlobal = null;
 
   const piso = document.querySelector(".piso");
+  const mainContenedor = document.querySelector(".main-contenedor"); // Referencia a main-contenedor
   let recuadroMesas = document.querySelector(".recuadro-mesas");
   if (!recuadroMesas) {
     recuadroMesas = document.createElement("div");
@@ -89,22 +90,37 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!nombre || !nombre.trim()) return;
     const cliente = crearElemento(nombre, "cc");
 
-    // Obtener el contenedor de la barra plateada
+    // Obtener la barra plateada
     const barraPlateada = document.querySelector(".barra");
 
     if (barraPlateada) {
       // Obtener las coordenadas y tamaño de la barra
       const barraRect = barraPlateada.getBoundingClientRect();
 
-      // Posicionar el cliente en la parte inferior del recuadro piso, por encima de la barra plateada
+      // Posicionar el cliente sobre la barra plateada ajustando la posición
       cliente.style.position = "absolute";
-      cliente.style.left = `${barraRect.left + 10 + clientesEnBarra * 60}px`; // Ajusta horizontalmente
-      cliente.style.bottom = `${piso.clientHeight - barraRect.top + 10}px`; // Coloca el cliente sobre la barra plateada
+      cliente.style.left = `${barraRect.left + 10 + clientesEnBarra * 60}px`; // Ajuste horizontal
+      cliente.style.top = `${barraRect.top - 40}px`; // Ajuste vertical
 
-      clientesEnBarra++; // Incrementar el número de clientes en la barra
+      clientesEnBarra++; // Incrementar número de clientes en la barra
     }
 
-    piso.appendChild(cliente); // Agregar el cliente al recuadro del piso
+    piso.appendChild(cliente); // Agregar cliente al contenedor principal (piso)
+  });
+
+  btnAgregarBarra.addEventListener("click", () => {
+    const nombre = prompt("¿Cómo se llama el cliente?");
+    if (!nombre || !nombre.trim()) return;
+    const cliente = crearElemento(nombre, "cc");
+
+    // Colocamos el cliente en la parte inferior de .main-contenedor
+    cliente.style.position = "absolute";
+    cliente.style.left = `${clientesEnBarra * 60}px`; // Desplazamos horizontalmente
+    cliente.style.bottom = "10px"; // Lo colocamos en la parte inferior
+
+    // Agregamos al main-contenedor
+    mainContenedor.appendChild(cliente); // Aquí lo agregamos al contenedor principal
+    clientesEnBarra++; // Contabilizamos los clientes en la barra
   });
 
   botonesProducto.forEach((button) => {

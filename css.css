@@ -229,8 +229,8 @@ h3 {
 
 /* Círculo cliente */
 .cc {
-  width: 80px;          /* Tamaño aumentado */
-  height: 80px;         /* Tamaño aumentado */
+  width: 60px;          /* Tamaño aumentado */
+  height: 60px;         /* Tamaño aumentado */
   font-size: 1rem;      /* Tamaño de texto ajustado */
   background-color: #888;
   border-radius: 50%;

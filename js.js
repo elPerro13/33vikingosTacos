@@ -98,13 +98,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Colocar el cliente sobre la barra plateada ajustando la posición
       cliente.style.position = "absolute";
-      cliente.style.bottom = `${barraRect.height + 5}px`; // Coloca el cliente justo encima de la barra
       cliente.style.left = `${barraRect.left + 10 + clientesEnBarra * 60}px`; // Ajustar el desplazamiento horizontal de los clientes
+      cliente.style.top = `${barraRect.top - 40}px`; // Coloca el cliente sobre la barra (ajustar -40px dependiendo del tamaño)
 
       clientesEnBarra++; // Incrementar el número de clientes en la barra
     }
 
-    recuadroMesas.appendChild(cliente); // Agregar el cliente al contenedor
+    piso.appendChild(cliente); // Agregar el cliente al contenedor general (piso), no dentro de la barra
   });
 
   botonesProducto.forEach((button) => {

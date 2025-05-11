@@ -31,6 +31,8 @@ document.addEventListener("DOMContentLoaded", () => {
     return () => `id-${++id}`;
   })();
 
+  let clientesEnBarra = 0;
+
   function mostrarOrden(id) {
     const orden = ordenesPorElemento.get(id);
     if (!orden) return;
@@ -86,7 +88,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const nombre = prompt("¿Cómo se llama el cliente?");
     if (!nombre || !nombre.trim()) return;
     const cliente = crearElemento(nombre, "cc");
-    recuadroClientes.appendChild(cliente);
+
+    // Posicionarlo sobre la "barra plateada"
+    cliente.style.position = "absolute";
+    cliente.style.bottom = "5px";
+    cliente.style.left = `${10 + clientesEnBarra * 60}px`;
+    clientesEnBarra++;
+
+    recuadroMesas.appendChild(cliente);
   });
 
   botonesProducto.forEach((button) => {
@@ -110,51 +119,41 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Botón "sumar" ahora actualiza el total
   const btnSumar = document.querySelector('[data-orden="sumar"]');
   if (btnSumar) {
     btnSumar.addEventListener("click", () => {
-      if (!idSeleccionadoGlobal) return;  // No hacer nada si no hay cliente/mesa seleccionado
+      if (!idSeleccionadoGlobal) return;
 
       const orden = ordenesPorElemento.get(idSeleccionadoGlobal);
       if (!orden) return;
 
-      // Sumar el total de la mesa/cliente seleccionado al total acumulado
       totalAcumulado += orden.total;
 
-      // Actualizar el total vendido en la interfaz
       if (totalSpan) {
         totalSpan.textContent = `$${totalAcumulado.toFixed(2)}`;
       }
 
-      // Resetear el total de la mesa/cliente después de sumar
       orden.total = 0;
       orden.productos = [];
-      mostrarOrden(idSeleccionadoGlobal); // Limpiar el área de la orden
+      mostrarOrden(idSeleccionadoGlobal);
     });
   }
 
-  // Permitir que el usuario edite el contenido de la nota y se mantenga
   ordenTextarea.addEventListener("input", () => {
-    if (!idSeleccionadoGlobal) return; // No hacer nada si no hay cliente/mesa seleccionado
+    if (!idSeleccionadoGlobal) return;
 
     const orden = ordenesPorElemento.get(idSeleccionadoGlobal);
     if (!orden) return;
 
-    // Extraer el contenido del textarea
     const texto = ordenTextarea.value.trim();
-    
-    // Separar por saltos de línea
-    const productos = texto.split("\n").slice(1, -1); // Ignorar la línea con "Cliente/Mesa" y la línea de total
-    
-    // Actualizar los productos y el total
+    const productos = texto.split("\n").slice(1, -1);
+
     orden.productos = productos;
     orden.total = productos.reduce((total, producto) => {
       const precio = parseFloat(producto.split('- $')[1]) || 0;
       return total + precio;
     }, 0);
 
-    // Actualizar el total mostrado en el textarea
     const totalNota = `Total: $${orden.total.toFixed(2)}`;
     ordenTextarea.value = `Cliente/Mesa: ${orden.nombre}\n` + productos.join("\n") + `\n${totalNota}`;
   });

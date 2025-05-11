@@ -89,22 +89,22 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!nombre || !nombre.trim()) return;
     const cliente = crearElemento(nombre, "cc");
 
-    // Obtener la barra plateada
+    // Obtener el contenedor de la barra plateada
     const barraPlateada = document.querySelector(".barra");
 
     if (barraPlateada) {
-      // Asegurarnos de que la barra esté posicionada correctamente
-      const barraRect = barraPlateada.getBoundingClientRect(); // Obtener el área de la barra plateada
+      // Obtener las coordenadas y tamaño de la barra
+      const barraRect = barraPlateada.getBoundingClientRect();
 
-      // Colocar el cliente sobre la barra plateada ajustando la posición
+      // Posicionar el cliente en la parte inferior del recuadro piso, por encima de la barra plateada
       cliente.style.position = "absolute";
-      cliente.style.left = `${barraRect.left + 10 + clientesEnBarra * 60}px`; // Ajustar el desplazamiento horizontal de los clientes
-      cliente.style.top = `${barraRect.top - 40}px`; // Coloca el cliente sobre la barra (ajustar -40px dependiendo del tamaño)
+      cliente.style.left = `${barraRect.left + 10 + clientesEnBarra * 60}px`; // Ajusta horizontalmente
+      cliente.style.bottom = `${piso.clientHeight - barraRect.top + 10}px`; // Coloca el cliente sobre la barra plateada
 
       clientesEnBarra++; // Incrementar el número de clientes en la barra
     }
 
-    piso.appendChild(cliente); // Agregar el cliente al contenedor general (piso), no dentro de la barra
+    piso.appendChild(cliente); // Agregar el cliente al recuadro del piso
   });
 
   botonesProducto.forEach((button) => {

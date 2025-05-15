@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", () => {
+ document.addEventListener("DOMContentLoaded", () => {
   const btnAgregarMesa = document.getElementById("agregar-cliente-mesa");
   const btnAgregarBarra = document.getElementById("agregar-cliente-barra");
   const btnEliminarCliente = document.getElementById("eliminar-cliente");
@@ -10,6 +10,11 @@ document.addEventListener("DOMContentLoaded", () => {
   let totalPrecio = 0;
   let totalAcumulado = 0;
   let idSeleccionadoGlobal = null;
+  let clientesEnBarra = 0;
+
+  const CLAVE_MESAS = 'ordenApp.mesas';
+  const CLAVE_BARRA = 'ordenApp.barra';
+  const CLAVE_TOTAL_ACUMULADO = 'ordenApp.totalAcumulado';
 
   const piso = document.querySelector(".piso");
   let recuadroMesas = document.querySelector(".recuadro-mesas");
@@ -31,7 +36,19 @@ document.addEventListener("DOMContentLoaded", () => {
     return () => `id-${++id}`;
   })();
 
-  let clientesEnBarra = 0;
+  function guardarTotalAcumulado() {
+    localStorage.setItem(CLAVE_TOTAL_ACUMULADO, totalAcumulado.toString());
+  }
+
+  function cargarTotalAcumulado() {
+    const totalGuardado = localStorage.getItem(CLAVE_TOTAL_ACUMULADO);
+    if (totalGuardado) {
+      totalAcumulado = parseFloat(totalGuardado) || 0;
+      if (totalSpan) {
+        totalSpan.textContent = `$${totalAcumulado.toFixed(2)}`;
+      }
+    }
+  }
 
   function mostrarOrden(id) {
     const orden = ordenesPorElemento.get(id);
@@ -77,11 +94,69 @@ document.addEventListener("DOMContentLoaded", () => {
     return div;
   }
 
+  function guardarMesas() {
+    const mesasParaGuardar = Array.from(recuadroMesas.children)
+      .filter(el => el.classList.contains('mesa'))
+      .map(mesaDiv => ({
+        id: mesaDiv.dataset.id,
+        nombre: mesaDiv.textContent.trim(),
+        orden: ordenesPorElemento.get(mesaDiv.dataset.id)
+      }));
+    localStorage.setItem(CLAVE_MESAS, JSON.stringify(mesasParaGuardar));
+  }
+
+  function cargarMesasGuardadas() {
+    const mesasGuardadasString = localStorage.getItem(CLAVE_MESAS);
+    if (mesasGuardadasString) {
+      const mesasGuardadas = JSON.parse(mesasGuardadasString);
+      mesasGuardadas.forEach(mesaInfo => {
+        const mesa = crearElemento(mesaInfo.nombre, "mesa");
+        mesa.dataset.id = mesaInfo.id;
+        ordenesPorElemento.set(mesaInfo.id, { ...mesaInfo.orden });
+        recuadroMesas.appendChild(mesa);
+      });
+    }
+  }
+
+  function guardarBarra() {
+    const barraParaGuardar = Array.from(recuadroMesas.children)
+      .filter(el => el.classList.contains('cc'))
+      .map(clienteDiv => ({
+        id: clienteDiv.dataset.id,
+        nombre: clienteDiv.textContent.trim(),
+        left: clienteDiv.style.left,
+        orden: ordenesPorElemento.get(clienteDiv.dataset.id)
+      }));
+    localStorage.setItem(CLAVE_BARRA, JSON.stringify(barraParaGuardar));
+  }
+
+  function cargarBarraGuardada() {
+    const barraGuardadaString = localStorage.getItem(CLAVE_BARRA);
+    if (barraGuardadaString) {
+      const barraGuardada = JSON.parse(barraGuardadaString);
+      barraGuardada.forEach(clienteInfo => {
+        const cliente = crearElemento(clienteInfo.nombre, "cc");
+        cliente.dataset.id = clienteInfo.id;
+        cliente.style.position = "absolute";
+        cliente.style.bottom = "5px";
+        cliente.style.left = clienteInfo.left;
+        ordenesPorElemento.set(clienteInfo.id, { ...clienteInfo.orden });
+        recuadroMesas.appendChild(cliente);
+        clientesEnBarra++;
+      });
+    }
+  }
+
+  cargarTotalAcumulado();
+  cargarMesasGuardadas();
+  cargarBarraGuardada();
+
   btnAgregarMesa.addEventListener("click", () => {
     const nombre = prompt("¿Cómo se llamará la mesa?");
     if (!nombre || !nombre.trim()) return;
     const mesa = crearElemento(nombre, "mesa");
     recuadroMesas.appendChild(mesa);
+    guardarMesas();
   });
 
   btnAgregarBarra.addEventListener("click", () => {
@@ -89,13 +164,13 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!nombre || !nombre.trim()) return;
     const cliente = crearElemento(nombre, "cc");
 
-    // Posicionarlo sobre la "barra plateada"
     cliente.style.position = "absolute";
     cliente.style.bottom = "5px";
     cliente.style.left = `${10 + clientesEnBarra * 60}px`;
     clientesEnBarra++;
 
     recuadroMesas.appendChild(cliente);
+    guardarBarra();
   });
 
   botonesProducto.forEach((button) => {
@@ -136,6 +211,7 @@ document.addEventListener("DOMContentLoaded", () => {
       orden.total = 0;
       orden.productos = [];
       mostrarOrden(idSeleccionadoGlobal);
+      guardarTotalAcumulado();
     });
   }
 
@@ -166,10 +242,21 @@ document.addEventListener("DOMContentLoaded", () => {
         const id = el.dataset.id;
         ordenesPorElemento.delete(id);
         el.remove();
+        if (el.classList.contains('cc')) {
+          clientesEnBarra--;
+        }
       }
     });
 
     ordenTextarea.value = "";
     idSeleccionadoGlobal = null;
+    guardarMesas();
+    guardarBarra();
+  });
+
+  window.addEventListener('beforeunload', () => {
+    guardarMesas();
+    guardarBarra();
+    guardarTotalAcumulado();
   });
 });

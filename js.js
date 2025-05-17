@@ -1,4 +1,4 @@
- document.addEventListener("DOMContentLoaded", () => {
+    Document.addEventListener("DOMContentLoaded", () => {
   const btnAgregarMesa = document.getElementById("agregar-cliente-mesa");
   const btnAgregarBarra = document.getElementById("agregar-cliente-barra");
   const btnEliminarCliente = document.getElementById("eliminar-cliente");
@@ -17,6 +17,7 @@
   const CLAVE_TOTAL_ACUMULADO = 'ordenApp.totalAcumulado';
   const CLAVE_ORDENES = 'ordenApp.ordenes';
   const CLAVE_SELECCIONADO = 'ordenApp.seleccionado';
+  const CLAVE_TEXTAREA = 'ordenApp.textarea'; // Nueva clave para el contenido del textarea
 
   const piso = document.querySelector(".piso");
   let recuadroMesas = document.querySelector(".recuadro-mesas");
@@ -70,13 +71,26 @@
     }
   }
 
+  function guardarTextarea(texto) {
+    localStorage.setItem(CLAVE_TEXTAREA, texto);
+  }
+
+  function cargarTextarea() {
+    const textoGuardado = localStorage.getItem(CLAVE_TEXTAREA);
+    if (textoGuardado) {
+      ordenTextarea.value = textoGuardado;
+    }
+  }
+
   function mostrarOrden(id) {
     const orden = ordenesPorElemento.get(id);
     if (!orden) return;
-    ordenTextarea.value =
+    const textoOrden =
       `Cliente/Mesa: ${orden.nombre}\n` +
       orden.productos.join('\n') +
       `\nTotal: $${orden.total.toFixed(2)}`;
+    ordenTextarea.value = textoOrden;
+    guardarTextarea(textoOrden); // Guardar el contenido del textarea
   }
 
   function crearElemento(nombre, clase) {
@@ -172,6 +186,7 @@
   cargarTotalAcumulado();
   cargarMesasGuardadas();
   cargarBarraGuardada();
+  cargarTextarea(); // Cargar el contenido del textarea al inicio
 
   // Mostrar orden seleccionada anterior
   const idAnteriorSeleccionado = localStorage.getItem(CLAVE_SELECCIONADO);
@@ -180,7 +195,7 @@
     if (elemento) {
       elemento.classList.add("seleccionado");
       idSeleccionadoGlobal = idAnteriorSeleccionado;
-      mostrarOrden(idSeleccionadoGlobal);
+      mostrarOrden(idAnteriorSeleccionado);
     }
   }
 
@@ -254,23 +269,34 @@
   }
 
   ordenTextarea.addEventListener("input", () => {
-    if (!idSeleccionadoGlobal) return;
+    if (!idSeleccionadoGlobal) {
+      guardarTextarea(ordenTextarea.value); // Guardar el textarea incluso si no hay selección
+      return;
+    }
 
     const orden = ordenesPorElemento.get(idSeleccionadoGlobal);
     if (!orden) return;
 
     const texto = ordenTextarea.value.trim();
-    const productos = texto.split("\n").slice(1, -1);
+    const lineas = texto.split("\n");
+    const nombreLinea = lineas[0];
+    const productosConTotal = lineas.slice(1);
+    const productosSolo = productosConTotal.slice(0, -1); // Exclude the last line (Total)
 
-    orden.productos = productos;
-    orden.total = productos.reduce((total, producto) => {
-      const precio = parseFloat(producto.split('- $')[1]) || 0;
-      return total + precio;
+    orden.productos = productosSolo.filter(linea => linea.trim() !== '');
+    orden.total = orden.productos.reduce((total, producto) => {
+      const partes = producto.split('- $');
+      if (partes.length === 2) {
+        const precio = parseFloat(partes[1]) || 0;
+        return total + precio;
+      }
+      return total;
     }, 0);
 
     const totalNota = `Total: $${orden.total.toFixed(2)}`;
-    ordenTextarea.value = `Cliente/Mesa: ${orden.nombre}\n` + productos.join("\n") + `\n${totalNota}`;
+    ordenTextarea.value = `${nombreLinea}\n${orden.productos.join("\n")}\n${totalNota}`;
 
+    guardarTextarea(ordenTextarea.value);
     guardarOrdenes();
   });
 
@@ -289,6 +315,7 @@
     });
 
     ordenTextarea.value = "";
+    guardarTextarea(""); // Limpiar y guardar el textarea
     idSeleccionadoGlobal = null;
     localStorage.removeItem(CLAVE_SELECCIONADO);
     guardarMesas();
@@ -301,6 +328,9 @@
     guardarBarra();
     guardarTotalAcumulado();
     guardarOrdenes();
+    guardarTextarea(ordenTextarea.value); // Guardar el contenido del textarea al salir
     localStorage.setItem(CLAVE_SELECCIONADO, idSeleccionadoGlobal || "");
   });
 });
+
+      

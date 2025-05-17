@@ -17,7 +17,6 @@
   const CLAVE_TOTAL_ACUMULADO = 'ordenApp.totalAcumulado';
   const CLAVE_ORDENES = 'ordenApp.ordenes';
   const CLAVE_SELECCIONADO = 'ordenApp.seleccionado';
-  const CLAVE_TEXTAREA = 'ordenApp.textarea'; // Nueva clave para el contenido del textarea
 
   const piso = document.querySelector(".piso");
   let recuadroMesas = document.querySelector(".recuadro-mesas");
@@ -71,26 +70,13 @@
     }
   }
 
-  function guardarTextarea(texto) {
-    localStorage.setItem(CLAVE_TEXTAREA, texto);
-  }
-
-  function cargarTextarea() {
-    const textoGuardado = localStorage.getItem(CLAVE_TEXTAREA);
-    if (textoGuardado) {
-      ordenTextarea.value = textoGuardado;
-    }
-  }
-
   function mostrarOrden(id) {
     const orden = ordenesPorElemento.get(id);
     if (!orden) return;
-    const textoOrden =
+    ordenTextarea.value =
       `Cliente/Mesa: ${orden.nombre}\n` +
       orden.productos.join('\n') +
       `\nTotal: $${orden.total.toFixed(2)}`;
-    ordenTextarea.value = textoOrden;
-    guardarTextarea(textoOrden); // Guardar el contenido del textarea
   }
 
   function crearElemento(nombre, clase) {
@@ -186,7 +172,6 @@
   cargarTotalAcumulado();
   cargarMesasGuardadas();
   cargarBarraGuardada();
-  cargarTextarea(); // Cargar el contenido del textarea al inicio
 
   // Mostrar orden seleccionada anterior
   const idAnteriorSeleccionado = localStorage.getItem(CLAVE_SELECCIONADO);
@@ -269,10 +254,7 @@
   }
 
   ordenTextarea.addEventListener("input", () => {
-    if (!idSeleccionadoGlobal) {
-      guardarTextarea(ordenTextarea.value); // Guardar el textarea incluso si no hay selección
-      return;
-    }
+    if (!idSeleccionadoGlobal) return;
 
     const orden = ordenesPorElemento.get(idSeleccionadoGlobal);
     if (!orden) return;
@@ -296,7 +278,6 @@
     const totalNota = `Total: $${orden.total.toFixed(2)}`;
     ordenTextarea.value = `${nombreLinea}\n${orden.productos.join("\n")}\n${totalNota}`;
 
-    guardarTextarea(ordenTextarea.value);
     guardarOrdenes();
   });
 
@@ -315,7 +296,6 @@
     });
 
     ordenTextarea.value = "";
-    guardarTextarea(""); // Limpiar y guardar el textarea
     idSeleccionadoGlobal = null;
     localStorage.removeItem(CLAVE_SELECCIONADO);
     guardarMesas();
@@ -328,9 +308,6 @@
     guardarBarra();
     guardarTotalAcumulado();
     guardarOrdenes();
-    guardarTextarea(ordenTextarea.value); // Guardar el contenido del textarea al salir
     localStorage.setItem(CLAVE_SELECCIONADO, idSeleccionadoGlobal || "");
   });
 });
-
-      

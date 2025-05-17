@@ -15,6 +15,7 @@
   const CLAVE_MESAS = 'ordenApp.mesas';
   const CLAVE_BARRA = 'ordenApp.barra';
   const CLAVE_TOTAL_ACUMULADO = 'ordenApp.totalAcumulado';
+  const CLAVE_ORDENES = 'ordenApp.ordenes';
 
   const piso = document.querySelector(".piso");
   let recuadroMesas = document.querySelector(".recuadro-mesas");
@@ -47,6 +48,24 @@
       if (totalSpan) {
         totalSpan.textContent = `$${totalAcumulado.toFixed(2)}`;
       }
+    }
+  }
+
+  function guardarOrdenes() {
+    const obj = {};
+    ordenesPorElemento.forEach((orden, id) => {
+      obj[id] = orden;
+    });
+    localStorage.setItem(CLAVE_ORDENES, JSON.stringify(obj));
+  }
+
+  function cargarOrdenesGuardadas() {
+    const data = localStorage.getItem(CLAVE_ORDENES);
+    if (data) {
+      const parsed = JSON.parse(data);
+      Object.entries(parsed).forEach(([id, orden]) => {
+        ordenesPorElemento.set(id, orden);
+      });
     }
   }
 
@@ -86,8 +105,8 @@
       if (e.target !== checkbox) {
         document.querySelectorAll(".mesa, .cc").forEach(el => el.classList.remove("seleccionado"));
         div.classList.add("seleccionado");
-        idSeleccionadoGlobal = id;
-        mostrarOrden(id);
+        idSeleccionadoGlobal = div.dataset.id;
+        mostrarOrden(idSeleccionadoGlobal);
       }
     });
 
@@ -147,6 +166,7 @@
     }
   }
 
+  cargarOrdenesGuardadas();
   cargarTotalAcumulado();
   cargarMesasGuardadas();
   cargarBarraGuardada();
@@ -157,6 +177,7 @@
     const mesa = crearElemento(nombre, "mesa");
     recuadroMesas.appendChild(mesa);
     guardarMesas();
+    guardarOrdenes();
   });
 
   btnAgregarBarra.addEventListener("click", () => {
@@ -171,6 +192,7 @@
 
     recuadroMesas.appendChild(cliente);
     guardarBarra();
+    guardarOrdenes();
   });
 
   botonesProducto.forEach((button) => {
@@ -191,6 +213,7 @@
       totalPrecio += precio;
 
       mostrarOrden(idSeleccionadoGlobal);
+      guardarOrdenes();
     });
   });
 
@@ -212,6 +235,7 @@
       orden.productos = [];
       mostrarOrden(idSeleccionadoGlobal);
       guardarTotalAcumulado();
+      guardarOrdenes();
     });
   }
 
@@ -225,6 +249,7 @@
     const productos = texto.split("\n").slice(1, -1);
 
     orden.productos = productos;
+    orden.total = productos.reduce((total
     orden.total = productos.reduce((total, producto) => {
       const precio = parseFloat(producto.split('- $')[1]) || 0;
       return total + precio;
@@ -232,6 +257,8 @@
 
     const totalNota = `Total: $${orden.total.toFixed(2)}`;
     ordenTextarea.value = `Cliente/Mesa: ${orden.nombre}\n` + productos.join("\n") + `\n${totalNota}`;
+
+    guardarOrdenes();
   });
 
   btnEliminarCliente.addEventListener("click", () => {
@@ -252,12 +279,13 @@
     idSeleccionadoGlobal = null;
     guardarMesas();
     guardarBarra();
+    guardarOrdenes();
   });
 
   window.addEventListener('beforeunload', () => {
     guardarMesas();
     guardarBarra();
     guardarTotalAcumulado();
+    guardarOrdenes();
   });
 });
-

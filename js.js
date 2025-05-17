@@ -7,7 +7,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const totalSpan = document.getElementById("total-acumulado");
 
   const ordenesPorElemento = new Map();
-  let totalPrecio = 0;
   let totalAcumulado = 0;
   let idSeleccionadoGlobal = null;
   let clientesEnBarra = 0;
@@ -19,7 +18,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const CLAVE_SELECCIONADO = 'ordenApp.seleccionado';
 
   const piso = document.querySelector(".piso");
-
   let recuadroMesas = document.querySelector(".recuadro-mesas");
   if (!recuadroMesas) {
     recuadroMesas = document.createElement("div");
@@ -47,9 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const totalGuardado = localStorage.getItem(CLAVE_TOTAL_ACUMULADO);
     if (totalGuardado) {
       totalAcumulado = parseFloat(totalGuardado) || 0;
-      if (totalSpan) {
-        totalSpan.textContent = `$${totalAcumulado.toFixed(2)}`;
-      }
+      totalSpan.textContent = `$${totalAcumulado.toFixed(2)}`;
     }
   }
 
@@ -80,20 +76,23 @@ document.addEventListener("DOMContentLoaded", () => {
       `\nTotal: $${orden.total.toFixed(2)}`;
   }
 
-  function crearElemento(nombre, clase) {
+  function crearElemento(nombre, clase, id = null, left = null) {
     const div = document.createElement("div");
     div.classList.add(clase);
     div.textContent = nombre;
     div.style.position = "relative";
 
-    const id = generarID();
-    div.dataset.id = id;
+    const nuevoID = id || generarID();
+    div.dataset.id = nuevoID;
 
-    ordenesPorElemento.set(id, {
-      nombre,
-      productos: [],
-      total: 0
-    });
+    const ordenExistente = ordenesPorElemento.get(nuevoID);
+    if (!ordenExistente) {
+      ordenesPorElemento.set(nuevoID, {
+        nombre,
+        productos: [],
+        total: 0
+      });
+    }
 
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
@@ -107,33 +106,41 @@ document.addEventListener("DOMContentLoaded", () => {
       if (e.target !== checkbox) {
         document.querySelectorAll(".mesa, .cc").forEach(el => el.classList.remove("seleccionado"));
         div.classList.add("seleccionado");
-        idSeleccionadoGlobal = div.dataset.id;
+        idSeleccionadoGlobal = nuevoID;
         localStorage.setItem(CLAVE_SELECCIONADO, idSeleccionadoGlobal);
-        mostrarOrden(idSeleccionadoGlobal);
+        mostrarOrden(nuevoID);
       }
     });
+
+    if (clase === "cc") {
+      div.style.position = "absolute";
+      div.style.bottom = "5px";
+      if (left !== null) {
+        div.style.left = left;
+      } else {
+        div.style.left = `${clientesEnBarra * 60}px`;
+      }
+    }
 
     return div;
   }
 
   function guardarMesas() {
-    const mesasParaGuardar = Array.from(recuadroMesas.children)
-      .filter(el => el.classList.contains('mesa'))
-      .map(mesaDiv => ({
-        id: mesaDiv.dataset.id,
-        nombre: mesaDiv.textContent.trim(),
-        orden: ordenesPorElemento.get(mesaDiv.dataset.id)
-      }));
-    localStorage.setItem(CLAVE_MESAS, JSON.stringify(mesasParaGuardar));
+    const mesas = Array.from(recuadroMesas.children).filter(el => el.classList.contains('mesa'));
+    const data = mesas.map(mesa => ({
+      id: mesa.dataset.id,
+      nombre: mesa.textContent.trim(),
+      orden: ordenesPorElemento.get(mesa.dataset.id)
+    }));
+    localStorage.setItem(CLAVE_MESAS, JSON.stringify(data));
   }
 
   function cargarMesasGuardadas() {
-    const mesasGuardadasString = localStorage.getItem(CLAVE_MESAS);
-    if (mesasGuardadasString) {
-      const mesasGuardadas = JSON.parse(mesasGuardadasString);
-      mesasGuardadas.forEach(mesaInfo => {
-        const mesa = crearElemento(mesaInfo.nombre, "mesa");
-        mesa.dataset.id = mesaInfo.id;
+    const data = localStorage.getItem(CLAVE_MESAS);
+    if (data) {
+      const mesas = JSON.parse(data);
+      mesas.forEach(mesaInfo => {
+        const mesa = crearElemento(mesaInfo.nombre, "mesa", mesaInfo.id);
         ordenesPorElemento.set(mesaInfo.id, { ...mesaInfo.orden });
         recuadroMesas.appendChild(mesa);
       });
@@ -141,30 +148,25 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function guardarBarra() {
-    const barraParaGuardar = Array.from(recuadroClientes.children)
-      .filter(el => el.classList.contains('cc'))
-      .map(clienteDiv => ({
-        id: clienteDiv.dataset.id,
-        nombre: clienteDiv.textContent.trim(),
-        left: clienteDiv.style.left,
-        orden: ordenesPorElemento.get(clienteDiv.dataset.id)
-      }));
-    localStorage.setItem(CLAVE_BARRA, JSON.stringify(barraParaGuardar));
+    const clientes = Array.from(recuadroMesas.children).filter(el => el.classList.contains('cc'));
+    const data = clientes.map(cliente => ({
+      id: cliente.dataset.id,
+      nombre: cliente.textContent.trim(),
+      left: cliente.style.left,
+      orden: ordenesPorElemento.get(cliente.dataset.id)
+    }));
+    localStorage.setItem(CLAVE_BARRA, JSON.stringify(data));
   }
 
   function cargarBarraGuardada() {
-    const barraGuardadaString = localStorage.getItem(CLAVE_BARRA);
-    if (barraGuardadaString) {
-      const barraGuardada = JSON.parse(barraGuardadaString);
-      clientesEnBarra = barraGuardada.length;
-      barraGuardada.forEach(clienteInfo => {
-        const cliente = crearElemento(clienteInfo.nombre, "cc");
-        cliente.dataset.id = clienteInfo.id;
-        cliente.style.position = "absolute";
-        cliente.style.bottom = "5px";
-        cliente.style.left = clienteInfo.left;
-        ordenesPorElemento.set(clienteInfo.id, { ...clienteInfo.orden });
-        recuadroClientes.appendChild(cliente);
+    const data = localStorage.getItem(CLAVE_BARRA);
+    if (data) {
+      const clientes = JSON.parse(data);
+      clientes.forEach(info => {
+        const cliente = crearElemento(info.nombre, "cc", info.id, info.left);
+        ordenesPorElemento.set(info.id, { ...info.orden });
+        recuadroMesas.appendChild(cliente);
+        clientesEnBarra++;
       });
     }
   }
@@ -174,13 +176,13 @@ document.addEventListener("DOMContentLoaded", () => {
   cargarMesasGuardadas();
   cargarBarraGuardada();
 
-  const idAnteriorSeleccionado = localStorage.getItem(CLAVE_SELECCIONADO);
-  if (idAnteriorSeleccionado) {
-    const elemento = document.querySelector(`[data-id="${idAnteriorSeleccionado}"]`);
+  const idPrev = localStorage.getItem(CLAVE_SELECCIONADO);
+  if (idPrev) {
+    const elemento = document.querySelector(`[data-id="${idPrev}"]`);
     if (elemento) {
       elemento.classList.add("seleccionado");
-      idSeleccionadoGlobal = idAnteriorSeleccionado;
-      mostrarOrden(idAnteriorSeleccionado);
+      idSeleccionadoGlobal = idPrev;
+      mostrarOrden(idPrev);
     }
   }
 
@@ -197,11 +199,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const nombre = prompt("¿Cómo se llama el cliente?");
     if (!nombre || !nombre.trim()) return;
     const cliente = crearElemento(nombre.trim(), "cc");
-    cliente.style.position = "absolute";
-    cliente.style.bottom = "5px";
-    cliente.style.left = `${10 + clientesEnBarra * 60}px`;
+    recuadroMesas.appendChild(cliente);
     clientesEnBarra++;
-    recuadroClientes.appendChild(cliente);
     guardarBarra();
     guardarOrdenes();
   });
@@ -209,18 +208,16 @@ document.addEventListener("DOMContentLoaded", () => {
   botonesProducto.forEach((button) => {
     button.addEventListener("click", () => {
       const nombreProducto = button.getAttribute("data-orden");
-      if (nombreProducto === "sumar") return;
-      if (!idSeleccionadoGlobal) return;
+      if (nombreProducto === "sumar" || !idSeleccionadoGlobal) return;
 
-      let precio = parseFloat(button.getAttribute("data-precio")) || 0;
-      let descripcion = `${nombreProducto} - $${precio}`;
+      const precio = parseFloat(button.getAttribute("data-precio")) || 0;
+      const descripcion = `${nombreProducto} - $${precio}`;
 
       const orden = ordenesPorElemento.get(idSeleccionadoGlobal);
       if (!orden) return;
 
       orden.productos.push(descripcion);
       orden.total += precio;
-      totalPrecio += precio;
 
       mostrarOrden(idSeleccionadoGlobal);
       guardarOrdenes();
@@ -231,17 +228,15 @@ document.addEventListener("DOMContentLoaded", () => {
   if (btnSumar) {
     btnSumar.addEventListener("click", () => {
       if (!idSeleccionadoGlobal) return;
-
       const orden = ordenesPorElemento.get(idSeleccionadoGlobal);
       if (!orden) return;
 
       totalAcumulado += orden.total;
-      if (totalSpan) {
-        totalSpan.textContent = `$${totalAcumulado.toFixed(2)}`;
-      }
+      totalSpan.textContent = `$${totalAcumulado.toFixed(2)}`;
 
       orden.total = 0;
       orden.productos = [];
+
       mostrarOrden(idSeleccionadoGlobal);
       guardarTotalAcumulado();
       guardarOrdenes();
@@ -250,28 +245,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
   ordenTextarea.addEventListener("input", () => {
     if (!idSeleccionadoGlobal) return;
-
     const orden = ordenesPorElemento.get(idSeleccionadoGlobal);
     if (!orden) return;
 
     const texto = ordenTextarea.value.trim();
     const lineas = texto.split("\n");
-    const nombreLinea = lineas[0];
     const productosConTotal = lineas.slice(1);
-    const productosSolo = productosConTotal.slice(0, -1);
+    const productos = productosConTotal.slice(0, -1);
 
-    orden.productos = productosSolo.filter(linea => linea.trim() !== '');
-    orden.total = orden.productos.reduce((total, producto) => {
-      const partes = producto.split('- $');
-      if (partes.length === 2) {
-        const precio = parseFloat(partes[1]) || 0;
-        return total + precio;
-      }
-      return total;
+    orden.productos = productos.filter(p => p.trim() !== '');
+    orden.total = orden.productos.reduce((acc, prod) => {
+      const partes = prod.split("- $");
+      return acc + (parseFloat(partes[1]) || 0);
     }, 0);
 
-    const totalNota = `Total: $${orden.total.toFixed(2)}`;
-    ordenTextarea.value = `${nombreLinea}\n${orden.productos.join("\n")}\n${totalNota}`;
+    ordenTextarea.value = `${lineas[0]}\n${orden.productos.join("\n")}\nTotal: $${orden.total.toFixed(2)}`;
     guardarOrdenes();
   });
 
@@ -282,15 +270,17 @@ document.addEventListener("DOMContentLoaded", () => {
       if (checkbox && checkbox.checked) {
         const id = el.dataset.id;
         ordenesPorElemento.delete(id);
+        if (id === idSeleccionadoGlobal) {
+          idSeleccionadoGlobal = null;
+          ordenTextarea.value = "";
+        }
         el.remove();
-        if (el.classList.contains('cc')) {
+        if (el.classList.contains("cc")) {
           clientesEnBarra--;
         }
       }
     });
 
-    ordenTextarea.value = "";
-    idSeleccionadoGlobal = null;
     localStorage.removeItem(CLAVE_SELECCIONADO);
     guardarMesas();
     guardarBarra();

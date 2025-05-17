@@ -198,6 +198,7 @@
   botonesProducto.forEach((button) => {
     button.addEventListener("click", () => {
       const nombreProducto = button.getAttribute("data-orden");
+      if (nombreProducto === "sumar") return;
 
       if (!idSeleccionadoGlobal) return;
 
@@ -249,7 +250,6 @@
     const productos = texto.split("\n").slice(1, -1);
 
     orden.productos = productos;
-    orden.total = productos.reduce((total
     orden.total = productos.reduce((total, producto) => {
       const precio = parseFloat(producto.split('- $')[1]) || 0;
       return total + precio;

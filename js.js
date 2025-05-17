@@ -1,4 +1,4 @@
-    Document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", () => {
   const btnAgregarMesa = document.getElementById("agregar-cliente-mesa");
   const btnAgregarBarra = document.getElementById("agregar-cliente-barra");
   const btnEliminarCliente = document.getElementById("eliminar-cliente");
@@ -19,6 +19,7 @@
   const CLAVE_SELECCIONADO = 'ordenApp.seleccionado';
 
   const piso = document.querySelector(".piso");
+
   let recuadroMesas = document.querySelector(".recuadro-mesas");
   if (!recuadroMesas) {
     recuadroMesas = document.createElement("div");
@@ -140,7 +141,7 @@
   }
 
   function guardarBarra() {
-    const barraParaGuardar = Array.from(recuadroMesas.children)
+    const barraParaGuardar = Array.from(recuadroClientes.children)
       .filter(el => el.classList.contains('cc'))
       .map(clienteDiv => ({
         id: clienteDiv.dataset.id,
@@ -155,6 +156,7 @@
     const barraGuardadaString = localStorage.getItem(CLAVE_BARRA);
     if (barraGuardadaString) {
       const barraGuardada = JSON.parse(barraGuardadaString);
+      clientesEnBarra = barraGuardada.length;
       barraGuardada.forEach(clienteInfo => {
         const cliente = crearElemento(clienteInfo.nombre, "cc");
         cliente.dataset.id = clienteInfo.id;
@@ -162,8 +164,7 @@
         cliente.style.bottom = "5px";
         cliente.style.left = clienteInfo.left;
         ordenesPorElemento.set(clienteInfo.id, { ...clienteInfo.orden });
-        recuadroMesas.appendChild(cliente);
-        clientesEnBarra++;
+        recuadroClientes.appendChild(cliente);
       });
     }
   }
@@ -173,7 +174,6 @@
   cargarMesasGuardadas();
   cargarBarraGuardada();
 
-  // Mostrar orden seleccionada anterior
   const idAnteriorSeleccionado = localStorage.getItem(CLAVE_SELECCIONADO);
   if (idAnteriorSeleccionado) {
     const elemento = document.querySelector(`[data-id="${idAnteriorSeleccionado}"]`);
@@ -187,7 +187,7 @@
   btnAgregarMesa.addEventListener("click", () => {
     const nombre = prompt("¿Cómo se llamará la mesa?");
     if (!nombre || !nombre.trim()) return;
-    const mesa = crearElemento(nombre, "mesa");
+    const mesa = crearElemento(nombre.trim(), "mesa");
     recuadroMesas.appendChild(mesa);
     guardarMesas();
     guardarOrdenes();
@@ -196,14 +196,12 @@
   btnAgregarBarra.addEventListener("click", () => {
     const nombre = prompt("¿Cómo se llama el cliente?");
     if (!nombre || !nombre.trim()) return;
-    const cliente = crearElemento(nombre, "cc");
-
+    const cliente = crearElemento(nombre.trim(), "cc");
     cliente.style.position = "absolute";
     cliente.style.bottom = "5px";
     cliente.style.left = `${10 + clientesEnBarra * 60}px`;
     clientesEnBarra++;
-
-    recuadroMesas.appendChild(cliente);
+    recuadroClientes.appendChild(cliente);
     guardarBarra();
     guardarOrdenes();
   });
@@ -212,7 +210,6 @@
     button.addEventListener("click", () => {
       const nombreProducto = button.getAttribute("data-orden");
       if (nombreProducto === "sumar") return;
-
       if (!idSeleccionadoGlobal) return;
 
       let precio = parseFloat(button.getAttribute("data-precio")) || 0;
@@ -223,7 +220,6 @@
 
       orden.productos.push(descripcion);
       orden.total += precio;
-
       totalPrecio += precio;
 
       mostrarOrden(idSeleccionadoGlobal);
@@ -240,7 +236,6 @@
       if (!orden) return;
 
       totalAcumulado += orden.total;
-
       if (totalSpan) {
         totalSpan.textContent = `$${totalAcumulado.toFixed(2)}`;
       }
@@ -263,7 +258,7 @@
     const lineas = texto.split("\n");
     const nombreLinea = lineas[0];
     const productosConTotal = lineas.slice(1);
-    const productosSolo = productosConTotal.slice(0, -1); // Exclude the last line (Total)
+    const productosSolo = productosConTotal.slice(0, -1);
 
     orden.productos = productosSolo.filter(linea => linea.trim() !== '');
     orden.total = orden.productos.reduce((total, producto) => {
@@ -277,7 +272,6 @@
 
     const totalNota = `Total: $${orden.total.toFixed(2)}`;
     ordenTextarea.value = `${nombreLinea}\n${orden.productos.join("\n")}\n${totalNota}`;
-
     guardarOrdenes();
   });
 

@@ -141,6 +141,7 @@ header {
 
 .botones-producto button:hover {
   background-color: #C0C0C0;
+  whidth: 200px 
 }
 
 h3 {

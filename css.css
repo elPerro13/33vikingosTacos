@@ -75,16 +75,40 @@ header {
 
 /* Botones de clientes */
 .botones-clientes button {
-  padding: 0.5rem 1rem;
+  padding: 1rem 2rem;
   background-color: #333;
   color: white;
-  border-radius: 8px;
+  border-radius: 10px;
+  font-size: 1.2rem;
   cursor: pointer;
   transition: background-color 0.2s ease;
+  min-width: 180px;
+  margin: 0.5rem;
 }
 
 .botones-clientes button:hover {
   background-color: #48ea18;
+  color: black;
+  transform: scale(1.05);
+}
+
+/* Botones de producto grandes */
+.botones-producto button {
+  padding: 1rem 2rem;
+  font-size: 1.2rem;
+  background-color: #333;
+  color: white;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 180px;
+  margin: 0.5rem;
+}
+
+.botones-producto button:hover {
+  background-color: #48ea18;
+  color: black;
+  transform: scale(1.05);
 }
 
 /* Textarea orden */
@@ -101,25 +125,6 @@ header {
   resize: none;
   font-size: 1rem;
   margin-left: -10px;
-}
-
-/* Botones de producto grandes */
-.botones-producto button {
-  padding: 1.2rem 2rem;
-  font-size: 1.2rem;
-  background-color: #333;
-  color: white;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  min-width: 160px;
-  margin: 0.5rem;
-}
-
-.botones-producto button:hover {
-  background-color: #48ea18;
-  color: black;
-  transform: scale(1.05);
 }
 
 /* Títulos */

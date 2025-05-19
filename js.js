@@ -1,6 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
   const btnAgregarMesa = document.getElementById("agregar-cliente-mesa");
-  const btnAgregarBarra = document.getElementById("agregar-cliente-barra");
   const btnEliminarCliente = document.getElementById("eliminar-cliente");
   const ordenTextarea = document.querySelector(".orden-nota");
   const botonesProducto = document.querySelectorAll(".botones-producto button");
@@ -9,7 +8,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const ordenesPorElemento = new Map();
   let totalAcumulado = 0;
   let idSeleccionadoGlobal = null;
-  let clientesEnBarra = 0;
 
   const CLAVE_MESAS = 'ordenApp.mesas';
   const CLAVE_BARRA = 'ordenApp.barra';
@@ -76,7 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
       `\nTotal: $${orden.total.toFixed(2)}`;
   }
 
-  function crearElemento(nombre, clase, id = null, left = null) {
+  function crearElemento(nombre, clase, id = null) {
     const div = document.createElement("div");
     div.classList.add(clase);
     div.textContent = nombre;
@@ -103,20 +101,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     div.addEventListener("click", (e) => {
       if (e.target !== checkbox) {
-        document.querySelectorAll(".mesa, .cc").forEach(el => el.classList.remove("seleccionado"));
+        document.querySelectorAll(".mesa").forEach(el => el.classList.remove("seleccionado"));
         div.classList.add("seleccionado");
         idSeleccionadoGlobal = nuevoID;
         localStorage.setItem(CLAVE_SELECCIONADO, idSeleccionadoGlobal);
         mostrarOrden(nuevoID);
       }
     });
-
-    if (clase === "cc") {
-      div.classList.add("cc");
-      div.style.position = "absolute";
-      div.style.bottom = "5px";
-      div.style.left = left !== null ? left : `${clientesEnBarra * 60}px`;
-    }
 
     return div;
   }
@@ -143,26 +134,11 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function guardarBarra() {
-    const clientes = Array.from(recuadroClientes.children).filter(el => el.classList.contains('cc'));
-    const data = clientes.map(cliente => ({
-      id: cliente.dataset.id,
-      nombre: cliente.textContent.trim(),
-      left: cliente.style.left,
-      orden: ordenesPorElemento.get(cliente.dataset.id)
-    }));
-    localStorage.setItem(CLAVE_BARRA, JSON.stringify(data));
+    localStorage.setItem(CLAVE_BARRA, "[]");
   }
 
   function cargarBarraGuardada() {
-    const data = localStorage.getItem(CLAVE_BARRA);
-    if (data) {
-      JSON.parse(data).forEach(info => {
-        const cliente = crearElemento(info.nombre, "cc", info.id, info.left);
-        ordenesPorElemento.set(info.id, { ...info.orden });
-        recuadroClientes.appendChild(cliente);
-        clientesEnBarra++;
-      });
-    }
+    localStorage.setItem(CLAVE_BARRA, "[]");
   }
 
   cargarOrdenesGuardadas();
@@ -194,16 +170,6 @@ document.addEventListener("DOMContentLoaded", () => {
     guardarOrdenes();
   });
 
-  btnAgregarBarra.addEventListener("click", () => {
-    const nombre = prompt("¿Cómo se llama el cliente?");
-    if (!nombre || !nombre.trim()) return;
-    const cliente = crearElemento(nombre.trim(), "cc");
-    recuadroClientes.appendChild(cliente);
-    clientesEnBarra++;
-    guardarBarra();
-    guardarOrdenes();
-  });
-
   botonesProducto.forEach((button) => {
     button.addEventListener("click", () => {
       const nombreProducto = button.getAttribute("data-orden");
@@ -230,16 +196,11 @@ document.addEventListener("DOMContentLoaded", () => {
       totalAcumulado += orden.total;
       totalSpan.textContent = `$${totalAcumulado.toFixed(2)}`;
 
-      // Clonar el contenido del textarea y mostrarlo debajo del total
-      const copia = document.createElement("pre");
-      copia.textContent = ordenTextarea.value;
-      copia.style.marginTop = "1rem";
-      copia.style.padding = "0.5rem";
-      copia.style.backgroundColor = "#222";
-      copia.style.color = "#48ea18";
-      copia.style.borderRadius = "5px";
-      copia.style.whiteSpace = "pre-wrap";
-      ordenTextarea.parentElement.appendChild(copia);
+      const copia = document.createElement("textarea");
+      copia.className = "orden-nota copia";
+      copia.readOnly = true;
+      copia.value = `Cliente/Mesa: ${orden.nombre}\n${orden.productos.join("\n")}\nTotal: $${orden.total.toFixed(2)}`;
+      piso.appendChild(copia);
 
       orden.total = 0;
       orden.productos = [];
@@ -270,7 +231,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   btnEliminarCliente.addEventListener("click", () => {
-    const elementos = document.querySelectorAll(".mesa, .cc");
+    const elementos = document.querySelectorAll(".mesa");
     elementos.forEach((el) => {
       const checkbox = el.querySelector("input[type='checkbox']");
       if (checkbox && checkbox.checked) {
@@ -281,9 +242,6 @@ document.addEventListener("DOMContentLoaded", () => {
           ordenTextarea.value = "";
         }
         el.remove();
-        if (el.classList.contains("cc")) {
-          clientesEnBarra--;
-        }
       }
     });
 

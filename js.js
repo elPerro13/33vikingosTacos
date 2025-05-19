@@ -133,6 +133,7 @@ document.addEventListener("DOMContentLoaded", () => {
       orden: ordenesPorElemento.get(mesa.dataset.id)
     }));
     localStorage.setItem(CLAVE_MESAS, JSON.stringify(data));
+    guardarOrdenes(); // <-- añadido
   }
 
   function cargarMesasGuardadas() {
@@ -156,6 +157,7 @@ document.addEventListener("DOMContentLoaded", () => {
       orden: ordenesPorElemento.get(cliente.dataset.id)
     }));
     localStorage.setItem(CLAVE_BARRA, JSON.stringify(data));
+    guardarOrdenes(); // <-- añadido
   }
 
   function cargarBarraGuardada() {
@@ -192,7 +194,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const mesa = crearElemento(nombre.trim(), "mesa");
     recuadroMesas.appendChild(mesa);
     guardarMesas();
-    guardarOrdenes();
   });
 
   btnAgregarBarra.addEventListener("click", () => {
@@ -202,7 +203,6 @@ document.addEventListener("DOMContentLoaded", () => {
     recuadroMesas.appendChild(cliente);
     clientesEnBarra++;
     guardarBarra();
-    guardarOrdenes();
   });
 
   botonesProducto.forEach((button) => {
@@ -284,7 +284,6 @@ document.addEventListener("DOMContentLoaded", () => {
     localStorage.removeItem(CLAVE_SELECCIONADO);
     guardarMesas();
     guardarBarra();
-    guardarOrdenes();
   });
 
   window.addEventListener('beforeunload', () => {

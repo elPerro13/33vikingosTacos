@@ -165,30 +165,29 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  
   // --- Carga inicial ---
   cargarOrdenesGuardadas();
   cargarTotalAcumulado();
   cargarMesasGuardadas();
   cargarBarraGuardada();
 
-  // Restaurar selección previa o primera orden disponible
-  const idPrev = localStorage.getItem(CLAVE_SELECCIONADO);
-  if (idPrev && ordenesPorElemento.has(idPrev)) {
-    idSeleccionadoGlobal = idPrev;
-  } else if (ordenesPorElemento.size > 0) {
-    idSeleccionadoGlobal = ordenesPorElemento.keys().next().value;
-  }
-
-  if (idSeleccionadoGlobal) {
-    // Marcar en DOM
-    const elem = document.querySelector(`[data-id="${idSeleccionadoGlobal}"]`);
-    if (elem) {
-      elem.classList.add("seleccionado");
-      mostrarOrden(idSeleccionadoGlobal);
+  // Restaurar selección previa o primera orden disponible (MODIFICADO AQUÍ)
+  setTimeout(() => {
+    const idPrev = localStorage.getItem(CLAVE_SELECCIONADO);
+    if (idPrev && ordenesPorElemento.has(idPrev)) {
+      idSeleccionadoGlobal = idPrev;
+    } else if (ordenesPorElemento.size > 0) {
+      idSeleccionadoGlobal = ordenesPorElemento.keys().next().value;
     }
-  }
 
+    if (idSeleccionadoGlobal) {
+      const elem = document.querySelector(`[data-id="${idSeleccionadoGlobal}"]`);
+      if (elem) {
+        elem.classList.add("seleccionado");
+        mostrarOrden(idSeleccionadoGlobal);
+      }
+    }
+  }, 0);
 
   btnAgregarMesa.addEventListener("click", () => {
     const nombre = prompt("¿Cómo se llamará la mesa?");

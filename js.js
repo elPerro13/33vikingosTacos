@@ -85,8 +85,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const nuevoID = id || generarID();
     div.dataset.id = nuevoID;
 
-    const ordenExistente = ordenesPorElemento.get(nuevoID);
-    if (!ordenExistente) {
+    if (!ordenesPorElemento.has(nuevoID)) {
       ordenesPorElemento.set(nuevoID, {
         nombre,
         productos: [],
@@ -113,13 +112,10 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     if (clase === "cc") {
+      div.classList.add("cc");
       div.style.position = "absolute";
       div.style.bottom = "5px";
-      if (left !== null) {
-        div.style.left = left;
-      } else {
-        div.style.left = `${clientesEnBarra * 60}px`;
-      }
+      div.style.left = left !== null ? left : `${clientesEnBarra * 60}px`;
     }
 
     return div;
@@ -138,8 +134,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function cargarMesasGuardadas() {
     const data = localStorage.getItem(CLAVE_MESAS);
     if (data) {
-      const mesas = JSON.parse(data);
-      mesas.forEach(mesaInfo => {
+      JSON.parse(data).forEach(mesaInfo => {
         const mesa = crearElemento(mesaInfo.nombre, "mesa", mesaInfo.id);
         ordenesPorElemento.set(mesaInfo.id, { ...mesaInfo.orden });
         recuadroMesas.appendChild(mesa);
@@ -148,7 +143,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function guardarBarra() {
-    const clientes = Array.from(recuadroMesas.children).filter(el => el.classList.contains('cc'));
+    const clientes = Array.from(recuadroClientes.children).filter(el => el.classList.contains('cc'));
     const data = clientes.map(cliente => ({
       id: cliente.dataset.id,
       nombre: cliente.textContent.trim(),
@@ -161,30 +156,39 @@ document.addEventListener("DOMContentLoaded", () => {
   function cargarBarraGuardada() {
     const data = localStorage.getItem(CLAVE_BARRA);
     if (data) {
-      const clientes = JSON.parse(data);
-      clientes.forEach(info => {
+      JSON.parse(data).forEach(info => {
         const cliente = crearElemento(info.nombre, "cc", info.id, info.left);
         ordenesPorElemento.set(info.id, { ...info.orden });
-        recuadroMesas.appendChild(cliente);
+        recuadroClientes.appendChild(cliente);
         clientesEnBarra++;
       });
     }
   }
 
+  
+  // --- Carga inicial ---
   cargarOrdenesGuardadas();
   cargarTotalAcumulado();
   cargarMesasGuardadas();
   cargarBarraGuardada();
 
+  // Restaurar selección previa o primera orden disponible
   const idPrev = localStorage.getItem(CLAVE_SELECCIONADO);
-  if (idPrev) {
-    const elemento = document.querySelector(`[data-id="${idPrev}"]`);
-    if (elemento) {
-      elemento.classList.add("seleccionado");
-      idSeleccionadoGlobal = idPrev;
-      mostrarOrden(idPrev); // ✅ Restaurar la orden al recargar
+  if (idPrev && ordenesPorElemento.has(idPrev)) {
+    idSeleccionadoGlobal = idPrev;
+  } else if (ordenesPorElemento.size > 0) {
+    idSeleccionadoGlobal = ordenesPorElemento.keys().next().value;
+  }
+
+  if (idSeleccionadoGlobal) {
+    // Marcar en DOM
+    const elem = document.querySelector(`[data-id="${idSeleccionadoGlobal}"]`);
+    if (elem) {
+      elem.classList.add("seleccionado");
+      mostrarOrden(idSeleccionadoGlobal);
     }
   }
+
 
   btnAgregarMesa.addEventListener("click", () => {
     const nombre = prompt("¿Cómo se llamará la mesa?");
@@ -199,7 +203,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const nombre = prompt("¿Cómo se llama el cliente?");
     if (!nombre || !nombre.trim()) return;
     const cliente = crearElemento(nombre.trim(), "cc");
-    recuadroMesas.appendChild(cliente);
+    recuadroClientes.appendChild(cliente);
     clientesEnBarra++;
     guardarBarra();
     guardarOrdenes();
@@ -214,8 +218,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const descripcion = `${nombreProducto} - $${precio}`;
 
       const orden = ordenesPorElemento.get(idSeleccionadoGlobal);
-      if (!orden) return;
-
       orden.productos.push(descripcion);
       orden.total += precio;
 
@@ -229,7 +231,6 @@ document.addEventListener("DOMContentLoaded", () => {
     btnSumar.addEventListener("click", () => {
       if (!idSeleccionadoGlobal) return;
       const orden = ordenesPorElemento.get(idSeleccionadoGlobal);
-      if (!orden) return;
 
       totalAcumulado += orden.total;
       totalSpan.textContent = `$${totalAcumulado.toFixed(2)}`;
@@ -246,7 +247,6 @@ document.addEventListener("DOMContentLoaded", () => {
   ordenTextarea.addEventListener("input", () => {
     if (!idSeleccionadoGlobal) return;
     const orden = ordenesPorElemento.get(idSeleccionadoGlobal);
-    if (!orden) return;
 
     const texto = ordenTextarea.value.trim();
     const lineas = texto.split("\n");
@@ -294,18 +294,4 @@ document.addEventListener("DOMContentLoaded", () => {
     guardarOrdenes();
     localStorage.setItem(CLAVE_SELECCIONADO, idSeleccionadoGlobal || "");
   });
-
-  // ✅ ADICIÓN: Fuerza mostrar siempre la primera orden guardada, si existe
-  if (ordenesPorElemento.size > 0) {
-    if (!idSeleccionadoGlobal) {
-      const [primerID] = ordenesPorElemento.keys();
-      idSeleccionadoGlobal = primerID;
-    }
-    const elem = document.querySelector(`[data-id="${idSeleccionadoGlobal}"]`);
-    if (elem) {
-      document.querySelectorAll(".mesa, .cc").forEach(el => el.classList.remove("seleccionado"));
-      elem.classList.add("seleccionado");
-      mostrarOrden(idSeleccionadoGlobal);
-    }
-  }
 });

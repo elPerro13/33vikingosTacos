@@ -10,7 +10,7 @@ body {
 /* Estilo del encabezado principal */
 header {
   background-color: #000;
-  color: #C0C0C0;
+  color: #48ea18;
   padding: 1rem;
   font-family: 'Uncial Antiqua', serif;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
@@ -39,7 +39,7 @@ header {
 /* Ajustes del h1 a la derecha */
 .titulo-derecha {
   margin-left: auto;
-  color: #C0C0C0;
+  color: #48ea18;
 }
 
 /* Estilo para el icono de Facebook */
@@ -73,6 +73,7 @@ header {
   color: white;
 }
 
+/* Botones de clientes */
 .botones-clientes button {
   padding: 0.5rem 1rem;
   background-color: #333;
@@ -83,72 +84,50 @@ header {
 }
 
 .botones-clientes button:hover {
-  background-color: #C0C0C0;
+  background-color: #48ea18;
 }
 
+/* Textarea orden */
 .orden-textarea {
   margin-bottom: 1rem;
 }
 
 .orden-nota {
   width: 100%;
-  height: 80px;
+  height: 300px;
   border-radius: 8px;
   border: 1px solid #ccc;
   padding: 0.5rem;
   resize: none;
   font-size: 1rem;
+  margin-left: -10px;
 }
 
-.checkboxes-opciones {
-  margin-top: 1rem;
-  background-color: #222;
-  padding: 0.5rem;
-  border-radius: 8px;
-  border: 1px solid #444;
-  display: inline-flex;
-  gap: 1rem;
-}
-
-.checkboxes-opciones label {
-  font-size: 1rem;
-  padding: 0.4rem 0.8rem;
-  border-radius: 6px;
-  transition: background-color 0.2s ease;
-  display: flex;
-  align-items: center;
-  color: white;
-}
-
-.checkboxes-opciones label:hover {
-  background-color: #C0C0C0;
-  color: #000;
-  cursor: pointer;
-}
-
-.checkboxes-opciones input[type="checkbox"] {
-  margin-right: 0.4rem;
-}
-
+/* Botones de producto grandes */
 .botones-producto button {
-  padding: 0.5rem 1rem;
+  padding: 1.2rem 2rem;
+  font-size: 1.2rem;
   background-color: #333;
   color: white;
-  border-radius: 8px;
+  border-radius: 10px;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: all 0.2s ease;
+  min-width: 160px;
+  margin: 0.5rem;
 }
 
 .botones-producto button:hover {
-  background-color: #C0C0C0;
-  whidth: 200px 
+  background-color: #48ea18;
+  color: black;
+  transform: scale(1.05);
 }
 
+/* Títulos */
 h3 {
-  color: #C0C0C0;
+  color: #48ea18;
 }
 
-/* 🆕 NUEVO: Reemplazo visual del recuadro con borde 3D */
+/* Recuadro de mesas */
 .recuadro-mesas {
   width: 500px;
   height: 300px;
@@ -156,16 +135,11 @@ h3 {
   margin-top: 1rem;
   box-sizing: border-box;
   border-radius: 10px;
-
-  /* Borde 3D */
   border: 10px ridge #555;
-
-  /* Barra plateada */
   position: relative;
   box-shadow:
     inset 0 -40px 0 0 #333,
     inset 0 -45px 0 3px #000;
-
   padding: 1rem;
   display: flex;
   flex-wrap: wrap;
@@ -183,6 +157,7 @@ h3 {
   left: 0;
 }
 
+/* Mesa */
 .mesa {
   background-color: #aaa;
   width: 100px;
@@ -198,21 +173,11 @@ h3 {
 }
 
 .mesa:hover {
-  background-color: #C0C0C0;
+  background-color: #48ea18;
   transform: scale(1.05);
 }
 
-.recuadro-clientes {
-  position: absolute;
-  bottom: 10px;
-  left: 0;
-  right: 0;
-  display: flex;
-  gap: 10px;
-  padding: 10px;
-  justify-content: center;
-}
-
+/* Recuadro clientes */
 .recuadro-clientes {
   display: flex;
   flex-wrap: wrap;
@@ -225,9 +190,10 @@ h3 {
   z-index: 1;
 }
 
+/* Cliente */
 .cc {
-  width: 60px;
-  height: 60px;
+  width: 80px;
+  height: 80px;
   font-size: 1rem;
   background-color: #888;
   border-radius: 50%;
@@ -241,30 +207,6 @@ h3 {
 }
 
 .cc:hover {
-  background-color: #C0C0C0;
+  background-color: #48ea18;
   transform: scale(1.05);
-}
-
-.mesa,
-.cc {
-  position: relative;
-}
-
-.mesa input[type="checkbox"],
-.cc input[type="checkbox"] {
-  position: absolute;
-  top: 2px;
-  right: 2px;
-  transform: scale(0.8);
-}
-
-.orden-nota {
-  width: 100%;
-  height: 300px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  padding: 0.5rem;
-  resize: none;
-  font-size: 1rem;
-  margin-left: -10px;
 }

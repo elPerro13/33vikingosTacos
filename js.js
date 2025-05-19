@@ -294,4 +294,14 @@ document.addEventListener("DOMContentLoaded", () => {
     guardarOrdenes();
     localStorage.setItem(CLAVE_SELECCIONADO, idSeleccionadoGlobal || "");
   });
+
+  // ✅ ADICIÓN: Mostrar una orden si no se seleccionó nada
+  if (!idSeleccionadoGlobal) {
+    const primero = document.querySelector(".mesa, .cc");
+    if (primero) {
+      primero.classList.add("seleccionado");
+      idSeleccionadoGlobal = primero.dataset.id;
+      mostrarOrden(idSeleccionadoGlobal);
+    }
+  }
 });

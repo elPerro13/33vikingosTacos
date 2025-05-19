@@ -165,13 +165,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // --- Carga inicial ---
   cargarOrdenesGuardadas();
   cargarTotalAcumulado();
   cargarMesasGuardadas();
   cargarBarraGuardada();
 
-  // Restaurar selección previa o primera orden disponible
   const idPrev = localStorage.getItem(CLAVE_SELECCIONADO);
   if (idPrev && ordenesPorElemento.has(idPrev)) {
     idSeleccionadoGlobal = idPrev;
@@ -231,6 +229,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
       totalAcumulado += orden.total;
       totalSpan.textContent = `$${totalAcumulado.toFixed(2)}`;
+
+      // Clonar el contenido del textarea y mostrarlo debajo del total
+      const copia = document.createElement("pre");
+      copia.textContent = ordenTextarea.value;
+      copia.style.marginTop = "1rem";
+      copia.style.padding = "0.5rem";
+      copia.style.backgroundColor = "#222";
+      copia.style.color = "#48ea18";
+      copia.style.borderRadius = "5px";
+      copia.style.whiteSpace = "pre-wrap";
+      ordenTextarea.parentElement.appendChild(copia);
 
       orden.total = 0;
       orden.productos = [];

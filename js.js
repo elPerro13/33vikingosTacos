@@ -295,12 +295,16 @@ document.addEventListener("DOMContentLoaded", () => {
     localStorage.setItem(CLAVE_SELECCIONADO, idSeleccionadoGlobal || "");
   });
 
-  // ✅ ADICIÓN: Mostrar una orden si no se seleccionó nada
-  if (!idSeleccionadoGlobal) {
-    const primero = document.querySelector(".mesa, .cc");
-    if (primero) {
-      primero.classList.add("seleccionado");
-      idSeleccionadoGlobal = primero.dataset.id;
+  // ✅ ADICIÓN: Fuerza mostrar siempre la primera orden guardada, si existe
+  if (ordenesPorElemento.size > 0) {
+    if (!idSeleccionadoGlobal) {
+      const [primerID] = ordenesPorElemento.keys();
+      idSeleccionadoGlobal = primerID;
+    }
+    const elem = document.querySelector(`[data-id="${idSeleccionadoGlobal}"]`);
+    if (elem) {
+      document.querySelectorAll(".mesa, .cc").forEach(el => el.classList.remove("seleccionado"));
+      elem.classList.add("seleccionado");
       mostrarOrden(idSeleccionadoGlobal);
     }
   }

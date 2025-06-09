@@ -185,3 +185,23 @@ h3 {
 #total-acumulado {
   color: black !important;
 }
+
+/* NUEVOS ESTILOS AGREGADOS */
+
+/* Estilo verde para enlace o botón "Menu" */
+a[href="menu.html"],
+button[data-orden="menu"] {
+  color: #48ea18 !important;
+  font-weight: bold;
+}
+
+/* Selector de mesas o clientes más grande y estilizado */
+#selector-mesas {
+  font-size: 1.2rem;
+  padding: 10px;
+  border-radius: 8px;
+  background-color: #111;
+  color: #48ea18;
+  border: 2px solid #48ea18;
+  margin-bottom: 10px;
+}

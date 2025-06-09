@@ -183,7 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
       localStorage.removeItem('imagenesOrdenes'); // <-- limpiar imágenes también
       ordenes = {};
       totalAcumulado = 0;
-      selectorMesas.innerHTML = '<option value="" disabled selected>Selecciona una mesa</option>';
+      selectorMesas.innerHTML = '<option value="" disabled selected style="color: #48ea18;">Selecciona una mesa</option>';
       textareaOrden.value = '';
       spanTotalAcumulado.textContent = '$0.00';
 

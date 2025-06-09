@@ -132,7 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Función para crear imagen con texto de la orden
   function crearImagenDeTexto(texto) {
     const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext(' ' );
     const padding = 20;
     const lineHeight = 24;
     const lines = texto.split('\n');
@@ -162,23 +162,14 @@ document.addEventListener('DOMContentLoaded', () => {
     return img;
   }
 
-  // Botón sumar total de la orden del cliente seleccionado (MODIFICADO)
+  // Botón sumar total de la orden del cliente seleccionado
   btnSumar.addEventListener('click', () => {
     const id = selectorMesas.value;
-    if (!id || !ordenes[id]) return;
+    if (!id || !ordenes[id]) return; // Si no hay cliente seleccionado, no hacer nada
 
-    // Calcular total real desde el contenido actual del textarea
-    const lineas = textareaOrden.value.split('\n');
-    let totalRecalculado = 0;
+    const sumaNueva = ordenes[id].total;
 
-    lineas.forEach(linea => {
-      const match = linea.match(/\$([\d.]+)/);
-      if (match) {
-        totalRecalculado += parseFloat(match[1]);
-      }
-    });
-
-    totalAcumulado += totalRecalculado;
+    totalAcumulado += sumaNueva;
     spanTotalAcumulado.textContent = `$${totalAcumulado.toFixed(2)}`;
     localStorage.setItem('totalAcumulado', totalAcumulado.toFixed(2));
 
@@ -219,7 +210,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Guardar texto manual editado por el usuario
+  // Guardar texto manual editado por el usuario y recalcular total
   textareaOrden.addEventListener('input', () => {
     const id = selectorMesas.value;
     if (!id || !ordenes[id]) return;
@@ -231,11 +222,24 @@ document.addEventListener('DOMContentLoaded', () => {
       !line.startsWith(nombre) && !line.startsWith('Total:')
     ).join('\n');
 
-    ordenes[id].texto = cuerpo;
-    localStorage.setItem('ordenes', JSON.stringify(ordenes));
+    // Recalcular total desde las líneas con precios
+    let nuevoTotal = 0;
+    cuerpo.split('\n').forEach(linea => {
+      const match = linea.match(/\$([\d.]+)/);
+      if (match) {
+        nuevoTotal += parseFloat(match[1]);
+      }
+    });
 
-    // Línea agregada para guardar orden completa en localStorage (sin mover nada más)
-    localStorage.setItem('ordenActualTexto', textareaOrden.value);
+    ordenes[id].texto = cuerpo;
+    ordenes[id].total = nuevoTotal;
+
+    // Actualizar el contenido del textarea con el nuevo total al final
+    let nuevoTexto = nombre + '\n' + cuerpo;
+    if (nuevoTotal > 0) nuevoTexto += `\nTotal: $${nuevoTotal.toFixed(2)}`;
+    textareaOrden.value = nuevoTexto;
+
+    localStorage.setItem('ordenes', JSON.stringify(ordenes));
+    localStorage.setItem('ordenActualTexto', nuevoTexto);
   });
 });
-

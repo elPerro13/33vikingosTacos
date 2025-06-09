@@ -162,14 +162,23 @@ document.addEventListener('DOMContentLoaded', () => {
     return img;
   }
 
-  // Botón sumar total de la orden del cliente seleccionado
+  // Botón sumar total de la orden del cliente seleccionado (MODIFICADO)
   btnSumar.addEventListener('click', () => {
     const id = selectorMesas.value;
-    if (!id || !ordenes[id]) return; // Si no hay cliente seleccionado, no hacer nada
+    if (!id || !ordenes[id]) return;
 
-    const sumaNueva = ordenes[id].total;
+    // Calcular total real desde el contenido actual del textarea
+    const lineas = textareaOrden.value.split('\n');
+    let totalRecalculado = 0;
 
-    totalAcumulado += sumaNueva;
+    lineas.forEach(linea => {
+      const match = linea.match(/\$([\d.]+)/);
+      if (match) {
+        totalRecalculado += parseFloat(match[1]);
+      }
+    });
+
+    totalAcumulado += totalRecalculado;
     spanTotalAcumulado.textContent = `$${totalAcumulado.toFixed(2)}`;
     localStorage.setItem('totalAcumulado', totalAcumulado.toFixed(2));
 
@@ -229,3 +238,4 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.setItem('ordenActualTexto', textareaOrden.value);
   });
 });
+

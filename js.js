@@ -41,6 +41,11 @@ document.addEventListener('DOMContentLoaded', () => {
     selectorMesas.dispatchEvent(new Event('change'));
   }
 
+  // Cargar texto guardado de la orden actual si existe (Línea agregada sin mover nada)
+  if (localStorage.getItem('ordenActualTexto')) {
+    textareaOrden.value = localStorage.getItem('ordenActualTexto');
+  }
+
   // Cambiar cliente seleccionado
   selectorMesas.addEventListener('change', () => {
     const id = selectorMesas.value;
@@ -207,5 +212,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     ordenes[id].texto = cuerpo;
     localStorage.setItem('ordenes', JSON.stringify(ordenes));
+
+    // Línea agregada para guardar orden completa en localStorage (sin mover nada más)
+    localStorage.setItem('ordenActualTexto', textareaOrden.value);
   });
 });

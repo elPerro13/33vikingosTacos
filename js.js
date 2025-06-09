@@ -92,9 +92,22 @@ document.addEventListener('DOMContentLoaded', () => {
       const producto = boton.dataset.orden;
       const precio = parseFloat(boton.dataset.precio);
       const linea = `${producto} - $${precio.toFixed(2)}`;
+      
+      // Extraer texto manual actual antes de sobrescribir
+      const lineas = textareaOrden.value.split('\n');
+      const nombre = ordenes[id].nombre;
+      const textoManual = lineas
+        .filter(line => !line.startsWith(nombre) && !line.startsWith('Total:') && !ordenes[id].texto.includes(line))
+        .join('\n');
+
       ordenes[id].texto += (ordenes[id].texto ? '\n' : '') + linea;
       ordenes[id].total += precio;
-      textareaOrden.value = ordenes[id].nombre + '\n' + ordenes[id].texto + `\nTotal: $${ordenes[id].total.toFixed(2)}`;
+
+      let textoCompleto = ordenes[id].nombre + '\n' + ordenes[id].texto;
+      if (textoManual) textoCompleto += '\n' + textoManual;
+      textoCompleto += `\nTotal: $${ordenes[id].total.toFixed(2)}`;
+
+      textareaOrden.value = textoCompleto;
       localStorage.setItem('ordenes', JSON.stringify(ordenes));
     });
   });
@@ -180,18 +193,19 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // === NUEVA FUNCIÓN AGREGADA PARA GUARDAR CAMBIOS MANUALES ===
+  // Guardar texto manual editado por el usuario
   textareaOrden.addEventListener('input', () => {
     const id = selectorMesas.value;
     if (!id || !ordenes[id]) return;
-    
+
     const lineas = textareaOrden.value.split('\n');
     const nombre = ordenes[id].nombre;
-    
-    // Excluir la línea del nombre y la del total
-    const textoFiltrado = lineas.filter(line => !line.startsWith(nombre) && !line.startsWith('Total:')).join('\n');
-    
-    ordenes[id].texto = textoFiltrado;
+
+    const cuerpo = lineas.filter(line =>
+      !line.startsWith(nombre) && !line.startsWith('Total:')
+    ).join('\n');
+
+    ordenes[id].texto = cuerpo;
     localStorage.setItem('ordenes', JSON.stringify(ordenes));
   });
 });

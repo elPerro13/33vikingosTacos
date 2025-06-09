@@ -179,4 +179,19 @@ document.addEventListener('DOMContentLoaded', () => {
       imagenesGuardadas = [];
     });
   }
+
+  // === NUEVA FUNCIÓN AGREGADA PARA GUARDAR CAMBIOS MANUALES ===
+  textareaOrden.addEventListener('input', () => {
+    const id = selectorMesas.value;
+    if (!id || !ordenes[id]) return;
+    
+    const lineas = textareaOrden.value.split('\n');
+    const nombre = ordenes[id].nombre;
+    
+    // Excluir la línea del nombre y la del total
+    const textoFiltrado = lineas.filter(line => !line.startsWith(nombre) && !line.startsWith('Total:')).join('\n');
+    
+    ordenes[id].texto = textoFiltrado;
+    localStorage.setItem('ordenes', JSON.stringify(ordenes));
+  });
 });

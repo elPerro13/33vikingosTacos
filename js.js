@@ -7,11 +7,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnSumar = document.querySelector('[data-orden="sumar"]');
   const spanTotalAcumulado = document.getElementById('total-acumulado');
   const contenedorCopias = document.getElementById('copias-ordenes');
+  const btnEliminarTodo = document.getElementById('eliminar-todo');
 
   let ordenes = JSON.parse(localStorage.getItem('ordenes')) || {};
   let totalAcumulado = parseFloat(localStorage.getItem('totalAcumulado')) || 0;
-
   let imagenesGuardadas = JSON.parse(localStorage.getItem('imagenesOrdenes')) || [];
+
+  spanTotalAcumulado.textContent = `$${totalAcumulado.toFixed(2)}`;
+
   imagenesGuardadas.forEach(src => {
     const img = new Image();
     img.src = src;
@@ -22,8 +25,6 @@ document.addEventListener('DOMContentLoaded', () => {
     img.style.maxWidth = '100%';
     contenedorCopias.appendChild(img);
   });
-
-  spanTotalAcumulado.textContent = `$${totalAcumulado.toFixed(2)}`;
 
   Object.keys(ordenes).forEach(id => {
     const opcion = document.createElement('option');
@@ -36,27 +37,12 @@ document.addEventListener('DOMContentLoaded', () => {
     selectorMesas.dispatchEvent(new Event('change'));
   }
 
-  if (localStorage.getItem('ordenActualTexto')) {
-    textareaOrden.value = localStorage.getItem('ordenActualTexto');
-
-    const textoGuardado = textareaOrden.value;
-    const primerLinea = textoGuardado.split('\n')[0];
-
-    for (const opcion of selectorMesas.options) {
-      if (opcion.textContent === primerLinea) {
-        selectorMesas.value = opcion.value;
-        selectorMesas.dispatchEvent(new Event('change'));
-        break;
-      }
-    }
-  }
-
   selectorMesas.addEventListener('change', () => {
     const id = selectorMesas.value;
     if (ordenes[id]) {
-      const textoCompleto = ordenes[id].nombre + '\n' +
+      const texto = ordenes[id].nombre + '\n' +
         (ordenes[id].texto ? ordenes[id].texto + `\nTotal: $${ordenes[id].total.toFixed(2)}` : '');
-      textareaOrden.value = textoCompleto;
+      textareaOrden.value = texto;
     } else {
       textareaOrden.value = '';
     }
@@ -97,20 +83,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const precio = parseFloat(boton.dataset.precio);
       const linea = `${producto} - $${precio.toFixed(2)}`;
 
-      const lineas = textareaOrden.value.split('\n');
-      const nombre = ordenes[id].nombre;
-      const textoManual = lineas
-        .filter(line => !line.startsWith(nombre) && !line.startsWith('Total:') && !ordenes[id].texto.includes(line))
-        .join('\n');
-
       ordenes[id].texto += (ordenes[id].texto ? '\n' : '') + linea;
       ordenes[id].total += precio;
 
-      let textoCompleto = ordenes[id].nombre + '\n' + ordenes[id].texto;
-      if (textoManual) textoCompleto += '\n' + textoManual;
-      textoCompleto += `\nTotal: $${ordenes[id].total.toFixed(2)}`;
-
-      textareaOrden.value = textoCompleto;
+      const texto = ordenes[id].nombre + '\n' + ordenes[id].texto + `\nTotal: $${ordenes[id].total.toFixed(2)}`;
+      textareaOrden.value = texto;
       localStorage.setItem('ordenes', JSON.stringify(ordenes));
     });
   });
@@ -168,11 +145,9 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.setItem('ordenes', JSON.stringify(ordenes));
   });
 
-  const btnEliminarTodo = document.getElementById('eliminar-todo');
   if (btnEliminarTodo) {
     btnEliminarTodo.addEventListener('click', () => {
-      if (!confirm('¿Estás seguro de que deseas eliminar TODAS las órdenes, imágenes y totales? Esta acción no se puede deshacer.')) return;
-
+      if (!confirm('¿Estás seguro de que deseas eliminar TODO?')) return;
       localStorage.removeItem('ordenes');
       localStorage.removeItem('clienteSeleccionado');
       localStorage.removeItem('totalAcumulado');
@@ -188,20 +163,4 @@ document.addEventListener('DOMContentLoaded', () => {
       imagenesGuardadas = [];
     });
   }
-
-  textareaOrden.addEventListener('input', () => {
-    const id = selectorMesas.value;
-    if (!id || !ordenes[id]) return;
-
-    const lineas = textareaOrden.value.split('\n');
-    const nombre = ordenes[id].nombre;
-
-    const cuerpo = lineas.filter(line =>
-      !line.startsWith(nombre) && !line.startsWith('Total:')
-    ).join('\n');
-
-    ordenes[id].texto = cuerpo;
-    localStorage.setItem('ordenes', JSON.stringify(ordenes));
-    localStorage.setItem('ordenActualTexto', textareaOrden.value);
-  });
 });

@@ -6,24 +6,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const botonesProducto = document.querySelectorAll('.botones-producto button');
   const btnSumar = document.querySelector('[data-orden="sumar"]');
   const spanTotalAcumulado = document.getElementById('total-acumulado');
-
-  // NUEVO contenedor debajo del botón "Sumar"
-  let contenedorCopias = document.getElementById('copias-ordenes');
-  if (!contenedorCopias) {
-    contenedorCopias = document.createElement('div');
-    contenedorCopias.id = 'copias-ordenes';
-    const seccionTotal = btnSumar.closest('.total');
-    if (seccionTotal) {
-      seccionTotal.appendChild(contenedorCopias);
-    }
-  }
+  const contenedorCopias = document.getElementById('copias-ordenes');
 
   let ordenes = JSON.parse(localStorage.getItem('ordenes')) || {};
   let totalAcumulado = parseFloat(localStorage.getItem('totalAcumulado')) || 0;
+
   let imagenesGuardadas = JSON.parse(localStorage.getItem('imagenesOrdenes')) || [];
-
-  spanTotalAcumulado.textContent = `$${totalAcumulado.toFixed(2)}`;
-
   imagenesGuardadas.forEach(src => {
     const img = new Image();
     img.src = src;
@@ -34,6 +22,8 @@ document.addEventListener('DOMContentLoaded', () => {
     img.style.maxWidth = '100%';
     contenedorCopias.appendChild(img);
   });
+
+  spanTotalAcumulado.textContent = `$${totalAcumulado.toFixed(2)}`;
 
   Object.keys(ordenes).forEach(id => {
     const opcion = document.createElement('option');
@@ -50,6 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
     textareaOrden.value = localStorage.getItem('ordenActualTexto');
     const textoGuardado = textareaOrden.value;
     const primerLinea = textoGuardado.split('\n')[0];
+
     for (const opcion of selectorMesas.options) {
       if (opcion.textContent === primerLinea) {
         selectorMesas.value = opcion.value;
@@ -104,6 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const producto = boton.dataset.orden;
       const precio = parseFloat(boton.dataset.precio);
       const linea = `${producto} - $${precio.toFixed(2)}`;
+
       const lineas = textareaOrden.value.split('\n');
       const nombre = ordenes[id].nombre;
       const textoManual = lineas
@@ -116,6 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
       let textoCompleto = ordenes[id].nombre + '\n' + ordenes[id].texto;
       if (textoManual) textoCompleto += '\n' + textoManual;
       textoCompleto += `\nTotal: $${ordenes[id].total.toFixed(2)}`;
+
       textareaOrden.value = textoCompleto;
       localStorage.setItem('ordenes', JSON.stringify(ordenes));
     });
@@ -127,15 +120,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const padding = 20;
     const lineHeight = 24;
     const lines = texto.split('\n');
+
     canvas.width = 400;
     canvas.height = padding * 2 + lineHeight * lines.length;
+
     ctx.fillStyle = '#333';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+
     ctx.fillStyle = '#48ea18';
     ctx.font = '16px Segoe UI, Tahoma, Geneva, Verdana, sans-serif';
+
     lines.forEach((line, i) => {
       ctx.fillText(line, padding, padding + (i + 1) * lineHeight);
     });
+
     const img = new Image();
     img.src = canvas.toDataURL('image/png');
     img.style.display = 'block';
@@ -149,7 +147,9 @@ document.addEventListener('DOMContentLoaded', () => {
   btnSumar.addEventListener('click', () => {
     const id = selectorMesas.value;
     if (!id || !ordenes[id]) return;
+
     const sumaNueva = ordenes[id].total;
+
     totalAcumulado += sumaNueva;
     spanTotalAcumulado.textContent = `$${totalAcumulado.toFixed(2)}`;
     localStorage.setItem('totalAcumulado', totalAcumulado.toFixed(2));
@@ -157,6 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (textareaOrden.value.trim()) {
       const imagenOrden = crearImagenDeTexto(textareaOrden.value);
       contenedorCopias.appendChild(imagenOrden);
+
       imagenesGuardadas.push(imagenOrden.src);
       localStorage.setItem('imagenesOrdenes', JSON.stringify(imagenesGuardadas));
     }
@@ -184,15 +185,30 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // ✅ ÚNICA MODIFICACIÓN PARA ACTUALIZAR TOTAL AL CAMBIAR TEXTO MANUALMENTE
   textareaOrden.addEventListener('input', () => {
     const id = selectorMesas.value;
     if (!id || !ordenes[id]) return;
+
     const lineas = textareaOrden.value.split('\n');
     const nombre = ordenes[id].nombre;
+
     const cuerpo = lineas.filter(line =>
       !line.startsWith(nombre) && !line.startsWith('Total:')
     ).join('\n');
+
+    // Recalcular total desde el texto manual
+    const nuevoTotal = cuerpo
+      .split('\n')
+      .filter(line => line.includes('$'))
+      .reduce((suma, linea) => {
+        const match = linea.match(/\$([\d.]+)/);
+        return match ? suma + parseFloat(match[1]) : suma;
+      }, 0);
+
     ordenes[id].texto = cuerpo;
+    ordenes[id].total = nuevoTotal;
+
     localStorage.setItem('ordenes', JSON.stringify(ordenes));
     localStorage.setItem('ordenActualTexto', textareaOrden.value);
   });

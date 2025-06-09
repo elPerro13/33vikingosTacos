@@ -44,6 +44,18 @@ document.addEventListener('DOMContentLoaded', () => {
   // Cargar texto guardado de la orden actual si existe (Línea agregada sin mover nada)
   if (localStorage.getItem('ordenActualTexto')) {
     textareaOrden.value = localStorage.getItem('ordenActualTexto');
+
+    // Seleccionar en el selector la mesa que coincide con el nombre en el textarea
+    const textoGuardado = textareaOrden.value;
+    const primerLinea = textoGuardado.split('\n')[0]; // asumimos que la primera línea es el nombre del cliente
+
+    for (const opcion of selectorMesas.options) {
+      if (opcion.textContent === primerLinea) {
+        selectorMesas.value = opcion.value;
+        selectorMesas.dispatchEvent(new Event('change'));
+        break;
+      }
+    }
   }
 
   // Cambiar cliente seleccionado
